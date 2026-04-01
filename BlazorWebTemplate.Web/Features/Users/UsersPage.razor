@@ -1,0 +1,94 @@
+@page "/users"
+@attribute [Authorize(Policy = AppPolicies.AdminOnly)]
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Users</PageTitle>
+
+@if (_isLoading)
+{
+    <MudSkeleton Height="320px" Class="editorial-skeleton" />
+}
+else if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true">@_errorMessage</MudAlert>
+}
+else if (_users.Count == 0)
+{
+    <MudPaper Elevation="0" Class="editorial-panel">
+        <MudText Typo="Typo.h4">No users matched.</MudText>
+        <MudText Typo="Typo.body2" Class="editorial-muted">Try a broader search term.</MudText>
+    </MudPaper>
+}
+else
+{
+    <MudStack Spacing="3">
+        <MudPaper Elevation="0" Class="editorial-panel">
+            <MudText Typo="Typo.overline" Class="editorial-kicker">Admin</MudText>
+            <MudText Typo="Typo.h3">Inspect the current people directory</MudText>
+            <MudText Typo="Typo.body2" Class="editorial-muted">An admin-only management view for people, roles, and organization context.</MudText>
+            <MudStack Row="true" Spacing="2" Class="editorial-toolbar">
+                <MudTextField T="string" Label="Search users" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_searchInput" />
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="ApplySearch">Search</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="ClearSearch">Clear</MudButton>
+            </MudStack>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Class="editorial-panel">
+            <MudTable T="UserSummary" Items="_users" Hover="true" Dense="true" Elevation="0" Class="editorial-table">
+                <HeaderContent>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Username</MudTh>
+                    <MudTh>Role</MudTh>
+                    <MudTh>Email</MudTh>
+                    <MudTh>Company</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name">@context.DisplayName</MudTd>
+                    <MudTd DataLabel="Username">@context.Username</MudTd>
+                    <MudTd DataLabel="Role">
+                        <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">@context.Role</MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Company">@context.CompanyName</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    </MudStack>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "search")]
+    public string? Search { get; set; }
+
+    private List<UserSummary> _users = [];
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private string _searchInput = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        _searchInput = Search ?? string.Empty;
+        var result = await UserService.GetUsersAsync(Search);
+        _isLoading = false;
+
+        if (result.IsFailure)
+        {
+            _errorMessage = result.Error?.Message ?? "The users could not be loaded.";
+            _users = [];
+            return;
+        }
+
+        _errorMessage = null;
+        _users = result.Value?.ToList() ?? [];
+    }
+
+    private void ApplySearch()
+        => NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(_searchInput)
+            ? "/users"
+            : $"/users?search={Uri.EscapeDataString(_searchInput)}", forceLoad: true);
+
+    private void ClearSearch()
+        => NavigationManager.NavigateTo("/users", forceLoad: true);
+}

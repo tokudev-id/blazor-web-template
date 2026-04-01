@@ -1,0 +1,81 @@
+@page "/posts/{Id:int}/delete"
+@attribute [Authorize(Policy = AppPolicies.EditorOrAbove)]
+@inject IPostService PostService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete post</PageTitle>
+
+@if (_isLoading)
+{
+    <MudSkeleton Height="240px" Class="editorial-skeleton" />
+}
+else if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true">@_errorMessage</MudAlert>
+}
+else if (_post is not null)
+{
+    <MudPaper Elevation="0" Class="editorial-panel editorial-danger-panel">
+        <MudText Typo="Typo.overline" Class="editorial-kicker">Delete</MudText>
+        <MudText Typo="Typo.h3">Remove this post?</MudText>
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true">
+            DummyJSON simulates delete operations, which makes this a safe starter flow for confirmation UX.
+        </MudAlert>
+        <MudText Typo="Typo.subtitle1">@_post.Title</MudText>
+        <MudText Typo="Typo.body2" Class="editorial-muted">@_post.Body</MudText>
+
+        <EditForm Model="_deleteFormModel" FormName="delete-post-form" method="post" OnSubmit="HandleDeleteAsync">
+            <MudStack Row="true" Spacing="2">
+                <MudButton Href="@($"/posts/{Id}")" Variant="Variant.Outlined" Color="Color.Secondary">Cancel</MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Error" Disabled="@_isSubmitting">
+                    @(_isSubmitting ? "Deleting..." : "Confirm delete")
+                </MudButton>
+            </MudStack>
+        </EditForm>
+    </MudPaper>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private PostDetail? _post;
+    private string? _errorMessage;
+    private bool _isLoading = true;
+    private bool _isSubmitting;
+    private readonly object _deleteFormModel = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await PostService.GetPostAsync(Id);
+        _isLoading = false;
+
+        if (result.IsFailure)
+        {
+            _errorMessage = result.Error?.Message ?? "The post could not be loaded.";
+            return;
+        }
+
+        _post = result.Value;
+    }
+
+    private async Task HandleDeleteAsync(EditContext _)
+    {
+        if (_isSubmitting)
+        {
+            return;
+        }
+
+        _isSubmitting = true;
+        var result = await PostService.DeleteAsync(Id);
+        _isSubmitting = false;
+
+        if (result.IsFailure)
+        {
+            _errorMessage = result.Error?.Message ?? "The post could not be deleted.";
+            return;
+        }
+
+        NavigationManager.NavigateTo("/posts", forceLoad: true);
+    }
+}

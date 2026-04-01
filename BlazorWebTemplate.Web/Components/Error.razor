@@ -1,0 +1,27 @@
+@page "/error"
+@attribute [AllowAnonymous]
+@using System.Diagnostics
+
+<PageTitle>Error</PageTitle>
+
+<section class="content-shell page-intro">
+    <p class="eyebrow">Failure</p>
+    <h1>An unexpected error interrupted the request.</h1>
+    <p class="lede">The boilerplate keeps the fallback page simple and avoids leaking sensitive details outside development.</p>
+
+    @if (ShowRequestId)
+    {
+        <p><strong>Request ID:</strong> <code>@RequestId</code></p>
+    }
+</section>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrWhiteSpace(RequestId);
+
+    protected override void OnInitialized()
+        => RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}

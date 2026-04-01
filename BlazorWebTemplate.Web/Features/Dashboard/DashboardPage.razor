@@ -1,0 +1,167 @@
+@page "/"
+@page "/dashboard"
+@attribute [Authorize]
+@inject IDashboardService DashboardService
+
+<PageTitle>Dashboard</PageTitle>
+
+@if (_isLoading)
+{
+    <MudGrid Spacing="3">
+        @for (var index = 0; index < 4; index++)
+        {
+            <MudItem xs="12" sm="6" lg="3">
+                <MudSkeleton Height="132px" Class="editorial-skeleton" />
+            </MudItem>
+        }
+        <MudItem xs="12" lg="8">
+            <MudSkeleton Height="320px" Class="editorial-skeleton" />
+        </MudItem>
+        <MudItem xs="12" lg="4">
+            <MudSkeleton Height="320px" Class="editorial-skeleton" />
+        </MudItem>
+    </MudGrid>
+}
+else if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true">@_errorMessage</MudAlert>
+}
+else if (_summary is not null)
+{
+    <MudStack Spacing="3">
+        <MudPaper Elevation="0" Class="editorial-hero">
+            <MudGrid Class="editorial-grid-center">
+                <MudItem xs="12" lg="8">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.overline" Class="editorial-kicker">Overview</MudText>
+                        <MudText Typo="Typo.h2">Clean signals for editorial operations.</MudText>
+                        <MudText Typo="Typo.body1" Class="editorial-muted">
+                            This dashboard keeps the interface calm while surfacing the metrics, content feed, and team context a CMS operator actually needs.
+                        </MudText>
+                    </MudStack>
+                </MudItem>
+                <MudItem xs="12" lg="4">
+                    <MudStack AlignItems="AlignItems.Start" Class="editorial-role-card">
+                        <MudText Typo="Typo.overline" Class="editorial-kicker">Current access</MudText>
+                        <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Medium">@_summary.MyRole</MudChip>
+                        <MudText Typo="Typo.body2" Class="editorial-muted">Role-aware routes and navigation are active across the workspace.</MudText>
+                    </MudStack>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+        <MudGrid Spacing="3">
+            <MudItem xs="12" sm="6" lg="3">
+                <MudPaper Elevation="0" Class="editorial-metric editorial-metric-featured">
+                    <MudIcon Icon="@Icons.Material.Rounded.Article" Size="Size.Medium" Color="Color.Primary" />
+                    <MudText Typo="Typo.overline" Class="editorial-kicker">Posts</MudText>
+                    <MudText Typo="Typo.h3">@_summary.TotalPosts</MudText>
+                    <MudText Typo="Typo.body2" Class="editorial-muted">Published and draft-ready content entries.</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="3">
+                <MudPaper Elevation="0" Class="editorial-metric">
+                    <MudIcon Icon="@Icons.Material.Rounded.GridView" Size="Size.Medium" Color="Color.Secondary" />
+                    <MudText Typo="Typo.overline" Class="editorial-kicker">Categories</MudText>
+                    <MudText Typo="Typo.h3">@_summary.TotalCategories</MudText>
+                    <MudText Typo="Typo.body2" Class="editorial-muted">Taxonomy buckets ready for filtering and routing.</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="3">
+                <MudPaper Elevation="0" Class="editorial-metric">
+                    <MudIcon Icon="@Icons.Material.Rounded.People" Size="Size.Medium" Color="Color.Info" />
+                    <MudText Typo="Typo.overline" Class="editorial-kicker">Users</MudText>
+                    <MudText Typo="Typo.h3">@_summary.TotalUsers</MudText>
+                    <MudText Typo="Typo.body2" Class="editorial-muted">People visible in the current backend directory.</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="3">
+                <MudPaper Elevation="0" Class="editorial-metric">
+                    <MudIcon Icon="@Icons.Material.Rounded.Schedule" Size="Size.Medium" Color="Color.Tertiary" />
+                    <MudText Typo="Typo.overline" Class="editorial-kicker">Last updated</MudText>
+                    <MudText Typo="Typo.h4">@_summary.LastUpdatedUtc.ToLocalTime().ToString("HH:mm")</MudText>
+                    <MudText Typo="Typo.body2" Class="editorial-muted">@_summary.LastUpdatedUtc.ToLocalTime().ToString("dddd, dd MMM yyyy")</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        <MudGrid Spacing="3">
+            <MudItem xs="12" lg="8">
+                <MudPaper Elevation="0" Class="editorial-panel">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="editorial-panel-head">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.overline" Class="editorial-kicker">Recent posts</MudText>
+                            <MudText Typo="Typo.h4">Editorial feed</MudText>
+                        </MudStack>
+                        <MudButton Href="/posts" Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Rounded.ArrowForward">Open module</MudButton>
+                    </MudStack>
+                    <MudDivider />
+                    <MudTable T="PostSummary" Items="_summary.RecentPosts" Hover="true" Dense="true" Elevation="0" Class="editorial-table">
+                        <HeaderContent>
+                            <MudTh>Title</MudTh>
+                            <MudTh>Author</MudTh>
+                            <MudTh>Views</MudTh>
+                            <MudTh>Tags</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Title">
+                                <MudLink Href="@($"/posts/{context.Id}")" Typo="Typo.subtitle2">@context.Title</MudLink>
+                                <MudText Typo="Typo.body2" Class="editorial-muted">@context.Excerpt</MudText>
+                            </MudTd>
+                            <MudTd DataLabel="Author">@context.AuthorName</MudTd>
+                            <MudTd DataLabel="Views">@context.Views</MudTd>
+                            <MudTd DataLabel="Tags">
+                                <MudStack Row="true" Spacing="1">
+                                    @foreach (var tag in context.Tags.Take(2))
+                                    {
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@tag</MudChip>
+                                    }
+                                </MudStack>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" lg="4">
+                <MudPaper Elevation="0" Class="editorial-panel editorial-side-panel">
+                    <MudText Typo="Typo.overline" Class="editorial-kicker">Operational notes</MudText>
+                    <MudText Typo="Typo.h4">What this shell demonstrates</MudText>
+                    <MudStack Spacing="1" Class="editorial-bullets">
+                        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                            <MudIcon Icon="@Icons.Material.Rounded.Lock" Size="Size.Small" Color="Color.Primary" />
+                            <MudText Typo="Typo.body2">Host-managed auth and secure cookie session flow</MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                            <MudIcon Icon="@Icons.Material.Rounded.Api" Size="Size.Small" Color="Color.Primary" />
+                            <MudText Typo="Typo.body2">Backend adapters isolated from page code</MudText>
+                        </MudStack>
+                        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                            <MudIcon Icon="@Icons.Material.Rounded.Tune" Size="Size.Small" Color="Color.Primary" />
+                            <MudText Typo="Typo.body2">Role-aware navigation and protected modules</MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudStack>
+}
+
+@code {
+    private DashboardSummary? _summary;
+    private bool _isLoading = true;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await DashboardService.GetSummaryAsync();
+        _isLoading = false;
+
+        if (result.IsFailure)
+        {
+            _errorMessage = result.Error?.Message ?? "The dashboard summary could not be loaded.";
+            return;
+        }
+
+        _summary = result.Value;
+    }
+}

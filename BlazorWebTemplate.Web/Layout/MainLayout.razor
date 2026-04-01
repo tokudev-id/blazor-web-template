@@ -1,0 +1,67 @@
+@inherits LayoutComponentBase
+
+<MudLayout Class="editorial-shell">
+    <MudAppBar Elevation="0" Dense="true" Class="editorial-appbar">
+        <MudIconButton Icon="@Icons.Material.Rounded.Menu" Color="Color.Inherit" OnClick="@ToggleDrawer" Class="editorial-menu-button" />
+        <MudStack Spacing="0">
+            <MudText Typo="Typo.overline" Class="editorial-kicker">CMS Boilerplate</MudText>
+            <MudText Typo="Typo.subtitle1">Editorial operations desk</MudText>
+        </MudStack>
+        <MudSpacer />
+        <AuthorizeView>
+            <Authorized Context="authState">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                    <MudChip T="string" Color="Color.Primary" Variant="Variant.Outlined" Size="Size.Small">
+                        @(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? RoleNames.Viewer)
+                    </MudChip>
+                    <MudAvatar Color="Color.Primary" Variant="Variant.Filled">
+                        @GetInitials(authState.User.FindFirst("display_name")?.Value ?? authState.User.Identity?.Name)
+                    </MudAvatar>
+                    <MudStack Spacing="0" Class="editorial-user">
+                        <MudText Typo="Typo.subtitle2">@(authState.User.FindFirst("display_name")?.Value ?? authState.User.Identity?.Name)</MudText>
+                        <MudText Typo="Typo.caption">Signed in</MudText>
+                    </MudStack>
+                    <LogoutForm />
+                </MudStack>
+            </Authorized>
+        </AuthorizeView>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen"
+               Elevation="0"
+               Width="304px"
+               Breakpoint="Breakpoint.Md"
+               Variant="DrawerVariant.Responsive"
+               ClipMode="DrawerClipMode.Always"
+               Class="editorial-drawer">
+        <SidebarNav />
+    </MudDrawer>
+
+    <MudMainContent Class="editorial-main">
+        <MudContainer MaxWidth="MaxWidth.False" Class="editorial-content">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+
+    private void ToggleDrawer()
+        => _drawerOpen = !_drawerOpen;
+
+    private static string GetInitials(string? displayName)
+    {
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            return "U";
+        }
+
+        var parts = displayName
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Take(2)
+            .Select(part => char.ToUpperInvariant(part[0]));
+
+        return string.Concat(parts);
+    }
+}
