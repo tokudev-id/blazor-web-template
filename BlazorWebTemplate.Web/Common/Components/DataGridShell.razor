@@ -1,0 +1,109 @@
+@typeparam TItem
+
+<MudPaper Elevation="0" Class="@($"app-card app-data-grid {Class}")">
+    @if (!string.IsNullOrWhiteSpace(Section) || !string.IsNullOrWhiteSpace(Title) || HeaderActions is not null)
+    {
+        <header class="app-card__header">
+            <div class="app-card__heading">
+                @if (!string.IsNullOrWhiteSpace(Section))
+                {
+                    <MudText Typo="Typo.overline" Class="app-card__section">@Section</MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(Title))
+                {
+                    <MudText Typo="Typo.h4">@Title</MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(Subtitle))
+                {
+                    <MudText Typo="Typo.body2" Class="app-text-muted">@Subtitle</MudText>
+                }
+            </div>
+            @if (HeaderActions is not null)
+            {
+                <div class="app-card__actions">
+                    @HeaderActions
+                </div>
+            }
+        </header>
+    }
+
+    @if (ToolbarContent is not null)
+    {
+        @ToolbarContent
+    }
+
+    <StateView IsLoading="@IsLoading"
+               ErrorMessage="@ErrorMessage"
+               IsEmpty="@(!IsLoading && string.IsNullOrWhiteSpace(ErrorMessage) && Items.Count == 0)"
+               EmptyTitle="@EmptyTitle"
+               EmptyMessage="@EmptyMessage"
+               EmptyIcon="@EmptyIcon">
+        <ChildContent>
+            <MudTable T="TItem" Items="@Items" Hover="true" Dense="@Dense" Elevation="0" Class="app-data-grid__table">
+                <HeaderContent>
+                    @HeaderContent
+                </HeaderContent>
+                <RowTemplate Context="item">
+                    @RowTemplate(item)
+                </RowTemplate>
+            </MudTable>
+
+            @if (FooterContent is not null)
+            {
+                <div class="app-data-grid__footer">
+                    @FooterContent
+                </div>
+            }
+        </ChildContent>
+    </StateView>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? Section { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Subtitle { get; set; }
+
+    [Parameter]
+    public string EmptyTitle { get; set; } = "Nothing matched your filters";
+
+    [Parameter]
+    public string EmptyMessage { get; set; } = "Try broadening the search or clearing some filters.";
+
+    [Parameter]
+    public string EmptyIcon { get; set; } = Icons.Material.Rounded.TableRows;
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public bool Dense { get; set; } = true;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<TItem> Items { get; set; } = [];
+
+    [Parameter]
+    public RenderFragment? HeaderActions { get; set; }
+
+    [Parameter]
+    public RenderFragment? ToolbarContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment HeaderContent { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public RenderFragment<TItem> RowTemplate { get; set; } = default!;
+}

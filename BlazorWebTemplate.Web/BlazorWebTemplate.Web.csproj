@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <ProjectReference Include="..\BlazorWebTemplate.Backend\BlazorWebTemplate.Backend.csproj" />
+    <ProjectReference Include="..\BlazorWebTemplate.Client\BlazorWebTemplate.Client.csproj" />
     <ProjectReference Include="..\BlazorWebTemplate.Shared\BlazorWebTemplate.Shared.csproj" />
   </ItemGroup>
 

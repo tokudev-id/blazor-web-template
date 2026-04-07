@@ -1,72 +1,113 @@
-# 🚀 Blazor Web Template
+# Blazor Web Template
 
-A modern, high-performance Blazor Web App template built with **.NET 8** and **MudBlazor**. This template is designed with a clean architecture, featuring a modular "Vertical Slice" aesthetic and pre-configured authentication.
+Enterprise-ready Blazor Web App starter built on `.NET 8`, `MudBlazor`, cookie authentication, and a clean `Web -> Client -> Shared` dependency flow.
 
----
+## What Changed
 
-## ✨ Features
+- Brandable corporate shell with configuration-backed theme tokens under `Branding`.
+- Reusable page primitives for headers, cards, state handling, tables, stat cards, toolbars, and confirmation panels.
+- Enterprise client defaults with validated options, correlation IDs, and retry-aware outbound HTTP clients.
+- URL-driven post list filters for search, tag, sorting, direction, and page size.
+- Safer content workflows with unsaved-change protection and stronger destructive confirmation.
 
-- **.NET 8 Blazor Web App**: Leverages the latest features including Interactive Server components.
-- **MudBlazor UI**: Integrated with MudBlazor 9.2.0 for a premium, responsive Material Design interface.
-- **Custom Theming**: Includes a built-in `EditorialMudTheme` for a unique, polished look.
-- **Vertical Slice Organization**: Features and components are logically organized to improve maintainability.
-- **Auth Ready**: Pre-configured Cookie-based authentication with `AuthenticationStateProvider`.
-- **API Integration**: Example integration with `DummyJson` for users and authentication.
-- **Test Suite**: Includes a dedicated test project with `xUnit` for both project structure and logic validation.
+## Project Structure
 
----
+- `BlazorWebTemplate.Web`
+  Corporate shell, pages, reusable UI primitives, theme/config, and Blazor composition.
+- `BlazorWebTemplate.Client`
+  Service orchestration, API clients, auth/session handling, retry handlers, and mapping.
+- `BlazorWebTemplate.Shared`
+  Contracts, auth constants, paging/query models, and shared enums.
+- `BlazorWebTemplate.Tests`
+  Unit and architecture tests for contracts, mapping, and enterprise defaults.
 
-## 📂 Project Structure
+## Run
 
-The solution is divided into four main projects:
+```bash
+cd BlazorWebTemplate.Web
+dotnet run
+```
 
-- **`BlazorWebTemplate.Web`**: The main entry point. Contains UI components, layouts, features, and theme definitions.
-- **`BlazorWebTemplate.Backend`**: Domain logic, services, and external API clients.
-- **`BlazorWebTemplate.Shared`**: Shared models, DTOs, and constants used across both Web and Backend.
-- **`BlazorWebTemplate.Tests`**: Automated tests (xUnit) ensuring architecture integrity and feature correctness.
+Default app URL: `http://localhost:5000`
 
----
+Demo credentials:
 
-## 🛠️ Tech Stack
+- Username: `emilys`
+- Password: `emilyspass`
 
-- **Framework**: .NET 8.0
-- **UI Framework**: [MudBlazor](https://mudblazor.com/)
-- **State Management**: Scoped Services & AuthenticationStateProvider
-- **Authentication**: Cookie Authentication
-- **Testing**: xUnit, Coverlet
-- **External Data**: DummyJSON (Sample)
+## Configuration
 
----
+`BlazorWebTemplate.Web/appsettings*.json` contains two important sections:
 
-## 🚀 Getting Started
+### `Branding`
 
-### Prerequisites
+Use this to white-label the shell without changing component code.
 
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+```json
+"Branding": {
+  "ProductName": "Unictive Control Center",
+  "ProductTagline": "Enterprise content operations",
+  "ProductDescription": "A reusable admin shell for content, workflow, and team operations.",
+  "CompanyName": "Unictive",
+  "SupportEmail": "support@unictive.example",
+  "PrimaryColor": "#1F4FD8",
+  "SecondaryColor": "#0F172A",
+  "AccentColor": "#14B8A6"
+}
+```
 
-### Running the Project
+### `DummyJson`
 
-1. **Clone the repository** (if applicable).
-2. **Navigate to the web project**:
-   ```bash
-   cd BlazorWebTemplate.Web
-   ```
-3. **Run the application**:
-   ```bash
-   dotnet run
-   ```
-4. Open your browser and navigate to `http://localhost:5000` (or the port specified in your console).
+Controls the demo backend endpoint and retry/timeout behavior.
 
----
+```json
+"DummyJson": {
+  "BaseUrl": "https://dummyjson.com/",
+  "RequestTimeoutSeconds": 20,
+  "RetryCount": 2,
+  "RetryDelayMilliseconds": 250
+}
+```
 
-## 📝 Key Components
+## Reusable UI Primitives
 
-- **Theme Engine**: Check `BlazorWebTemplate.Web/Theme/EditorialMudTheme.cs` to customize colors and typography.
-- **Auth Logic**: Services are defined in `BlazorWebTemplate.Backend/Auth` and registered in `Program.cs`.
-- **Sidebar**: The navigation menu is centrally managed in `Layout/SidebarNav.razor`.
+The main enterprise UI building blocks live under `BlazorWebTemplate.Web/Components/Primitives/`.
 
----
+- `AppPageHeader`
+- `AppSectionCard`
+- `AppToolbar`
+- `AppEmptyState`
+- `AppStateView`
+- `AppStatCard`
+- `AppConfirmPanel`
+- `AppDataGridShell<T>`
 
-## 📄 License
+Use these first before adding page-specific wrappers.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## Adding A New Module
+
+1. Add contracts to `Shared` if the feature needs cross-layer models.
+2. Add orchestration and API access to `Client`.
+3. Build the page in `Web/Features/<Module>/` using the shared primitives.
+4. Register route links in `Layout/SidebarNav.razor`.
+5. Prefer query-driven list state for filters, sorting, and pagination.
+6. Keep HTTP, retries, and auth token handling out of Razor components.
+
+## Enterprise Defaults
+
+- `AddClient(...)` wires options validation, correlation IDs, retry handling, token handling, and backend services.
+- `AddEnterpriseWebServices(...)` wires auth policies, branding validation, and the shell state service.
+- `AppShellState` centralizes drawer state, page context, and notification hooks.
+
+## Testing
+
+```bash
+dotnet test
+```
+
+Current test coverage focuses on:
+
+- architecture boundaries
+- shared query logic
+- role mapping
+- enterprise defaults and shell behavior

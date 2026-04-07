@@ -1,0 +1,49 @@
+<MudPaper Elevation="0" Class="@($"app-card {Class}")">
+    @if (!string.IsNullOrWhiteSpace(Section) || !string.IsNullOrWhiteSpace(Title) || HeaderActions is not null)
+    {
+        <header class="app-card__header">
+            <div class="app-card__heading">
+                @if (!string.IsNullOrWhiteSpace(Section))
+                {
+                    <MudText Typo="Typo.overline" Class="app-card__section">@Section</MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(Title))
+                {
+                    <MudText Typo="Typo.h4">@Title</MudText>
+                }
+                @if (!string.IsNullOrWhiteSpace(Subtitle))
+                {
+                    <MudText Typo="Typo.body2" Class="app-text-muted">@Subtitle</MudText>
+                }
+            </div>
+            @if (HeaderActions is not null)
+            {
+                <div class="app-card__actions">
+                    @HeaderActions
+                </div>
+            }
+        </header>
+    }
+
+    @ChildContent
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? Section { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Subtitle { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? HeaderActions { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+}

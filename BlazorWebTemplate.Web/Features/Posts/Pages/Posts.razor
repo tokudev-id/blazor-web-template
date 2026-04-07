@@ -1,0 +1,97 @@
+@page "/posts"
+@attribute [Authorize]
+@using PostSortDirection = BlazorWebTemplate.Shared.Common.SortDirection
+
+<PageTitle>Posts</PageTitle>
+
+<MudStack Spacing="3">
+    <PageHeader Title="Posts"
+                Section="Content"
+                Subtitle="Search, sort, and manage content records through a reusable data module shell."
+                Breadcrumbs="@_breadcrumbs">
+        <Actions>
+            <AuthorizeView Policy="@AppPolicies.EditorOrAbove">
+                <Authorized>
+                    <MudButton Href="@AppRoutes.NewPost" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Rounded.Add">Create post</MudButton>
+                </Authorized>
+            </AuthorizeView>
+        </Actions>
+    </PageHeader>
+
+    <DataGridShell TItem="PostSummary"
+                   Section="Collection"
+                   Title="Post records"
+                   Subtitle="Filters and list state stay URL-driven so modules remain easy to share and revisit."
+                   Items="@(_posts?.Items ?? Array.Empty<PostSummary>())"
+                   ErrorMessage="@_errorMessage"
+                   IsLoading="@_isLoading"
+                   EmptyTitle="No posts matched the current filters"
+                   EmptyMessage="Clear one or more filters to restore the starter data set.">
+        <ToolbarContent>
+            <PageToolbar>
+                <MudTextField T="string" Label="Search" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="PageState.QueryInput" />
+                <MudTextField T="string" Label="Tag" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="PageState.TagInput" />
+                <MudSelect T="string" Label="Sort by" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="PageState.SortByInput">
+                    <MudSelectItem Value="@("updated")">Latest</MudSelectItem>
+                    <MudSelectItem Value="@("title")">Title</MudSelectItem>
+                    <MudSelectItem Value="@("author")">Author</MudSelectItem>
+                    <MudSelectItem Value="@("views")">Views</MudSelectItem>
+                </MudSelect>
+                <MudSelect T="PostSortDirection" Label="Direction" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="PageState.SortDirectionInput">
+                    <MudSelectItem Value="@PostSortDirection.Descending">Descending</MudSelectItem>
+                    <MudSelectItem Value="@PostSortDirection.Ascending">Ascending</MudSelectItem>
+                </MudSelect>
+                <MudSelect T="int" Label="Page size" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="PageState.PageSizeInput">
+                    <MudSelectItem Value="6">6</MudSelectItem>
+                    <MudSelectItem Value="12">12</MudSelectItem>
+                    <MudSelectItem Value="24">24</MudSelectItem>
+                </MudSelect>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ApplyFilters">Apply</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="ClearFilters">Clear</MudButton>
+            </PageToolbar>
+        </ToolbarContent>
+        <HeaderContent>
+            <MudTh>Title</MudTh>
+            <MudTh>Author</MudTh>
+            <MudTh>Views</MudTh>
+            <MudTh>Tags</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Title">
+                <MudLink Href="@AppRoutes.PostDetails(context.Id)" Typo="Typo.subtitle2">@context.Title</MudLink>
+                <MudText Typo="Typo.body2" Class="app-text-muted">@context.Excerpt</MudText>
+            </MudTd>
+            <MudTd DataLabel="Author">@context.AuthorName</MudTd>
+            <MudTd DataLabel="Views">@context.Views</MudTd>
+            <MudTd DataLabel="Tags">
+                <MudStack Row="true" Spacing="1">
+                    @foreach (var tag in context.Tags.Take(3))
+                    {
+                        <MudChip T="string" Variant="Variant.Outlined" Size="MudBlazor.Size.Small" Href="@PageState.BuildTagLink(tag)">@tag</MudChip>
+                    }
+                </MudStack>
+            </MudTd>
+            <MudTd DataLabel="Actions">
+                <MudStack Row="true" Spacing="1">
+                    <MudButton Href="@AppRoutes.PostDetails(context.Id)" Variant="Variant.Text" Color="Color.Primary" Size="MudBlazor.Size.Small">Details</MudButton>
+                    <AuthorizeView Policy="@AppPolicies.EditorOrAbove">
+                        <Authorized Context="editorView">
+                            <MudButton Href="@AppRoutes.PostEdit(context.Id)" Variant="Variant.Text" Color="Color.Secondary" Size="MudBlazor.Size.Small">Edit</MudButton>
+                        </Authorized>
+                    </AuthorizeView>
+                </MudStack>
+            </MudTd>
+        </RowTemplate>
+        <FooterContent>
+            @if (_posts is not null)
+            {
+                <div class="app-pagination">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="@PageState.BuildPageLink(_posts.PageNumber - 1)" Disabled="@(!_posts.HasPreviousPage)">Previous</MudButton>
+                    <MudText Typo="Typo.body2" Class="app-text-muted">Page @_posts.PageNumber of @Math.Max(_posts.TotalPages, 1)</MudText>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="@PageState.BuildPageLink(_posts.PageNumber + 1)" Disabled="@(!_posts.HasNextPage)">Next</MudButton>
+                </div>
+            }
+        </FooterContent>
+    </DataGridShell>
+</MudStack>

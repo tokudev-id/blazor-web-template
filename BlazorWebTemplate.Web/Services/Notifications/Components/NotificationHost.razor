@@ -1,0 +1,26 @@
+@implements IDisposable
+@inject AppShellState ShellState
+@inject ISnackbar Snackbar
+
+@code {
+    protected override void OnInitialized()
+    {
+        ShellState.NotificationRaised += HandleNotificationAsync;
+    }
+
+    private Task HandleNotificationAsync(AppShellNotification notification)
+    {
+        Snackbar.Add(notification.Message, notification.Severity, configure =>
+        {
+            configure.RequireInteraction = notification.Severity is Severity.Error or Severity.Warning;
+            configure.DuplicatesBehavior = SnackbarDuplicatesBehavior.Prevent;
+        }, notification.Key);
+
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        ShellState.NotificationRaised -= HandleNotificationAsync;
+    }
+}

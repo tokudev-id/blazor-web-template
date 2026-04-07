@@ -1,11 +1,9 @@
-using BlazorWebTemplate.Backend.Extensions;
+using BlazorWebTemplate.Client;
 using BlazorWebTemplate.Shared.Auth;
 using BlazorWebTemplate.Web.Components;
-using BlazorWebTemplate.Web.Extensions;
-using BlazorWebTemplate.Web.State;
-using Microsoft.AspNetCore.Components.Authorization;
-using MudBlazor;
-using MudBlazor.Services;
+using BlazorWebTemplate.Web.Common.Constants;
+using BlazorWebTemplate.Web.Services;
+using BlazorWebTemplate.Web.Services.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,40 +12,30 @@ builder.Services
     .AddCookie(AuthConstants.CookieScheme, options =>
     {
         options.Cookie.Name = "BlazorWebTemplate.Auth";
-        options.LoginPath = "/login";
-        options.AccessDeniedPath = "/login";
+        options.LoginPath = AppRoutes.Login;
+        options.AccessDeniedPath = AppRoutes.Login;
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
     });
 
-builder.Services.AddAuthorization();
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<AuthenticationStateProvider, HttpContextAuthenticationStateProvider>();
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddMudServices(configuration =>
-{
-    configuration.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
-    configuration.SnackbarConfiguration.PreventDuplicates = true;
-    configuration.SnackbarConfiguration.NewestOnTop = true;
-});
-builder.Services.AddBackendServices(builder.Configuration);
-builder.Services.AddWebServices();
+builder.Services.AddClient(builder.Configuration);
+builder.Services.AddBlazorWebTemplateWeb(builder.Configuration);
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/error", createScopeForErrors: true);
+    app.UseExceptionHandler(AppRoutes.Error, createScopeForErrors: true);
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseBlazorWebTemplateWeb();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
+app.MapAuthenticationEndpoints();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

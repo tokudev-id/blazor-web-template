@@ -1,0 +1,19 @@
+<MudPaper Elevation="0" Class="app-card app-state-card">
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Icon="@Icons.Material.Rounded.ErrorOutline">
+        @Message
+    </MudAlert>
+    @if (Actions is not null)
+    {
+        <div class="app-state-card__actions">
+            @Actions
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Message { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? Actions { get; set; }
+}

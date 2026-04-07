@@ -1,0 +1,59 @@
+@if (IsLoading)
+{
+    if (LoadingContent is not null)
+    {
+        @LoadingContent
+    }
+    else
+    {
+        <Loading />
+    }
+}
+else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <ErrorViewer Message="@ErrorMessage" Actions="@ErrorActions" />
+}
+else if (IsEmpty)
+{
+    <MudPaper Elevation="0" Class="app-card app-state-card">
+        <EmptyState Title="@EmptyTitle" Message="@EmptyMessage" Icon="@EmptyIcon">
+            <Actions>@EmptyActions</Actions>
+        </EmptyState>
+    </MudPaper>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public bool IsEmpty { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public string EmptyTitle { get; set; } = "Nothing to show yet";
+
+    [Parameter]
+    public string EmptyMessage { get; set; } = "This screen does not have any results yet.";
+
+    [Parameter]
+    public string EmptyIcon { get; set; } = Icons.Material.Rounded.Inbox;
+
+    [Parameter]
+    public RenderFragment? ErrorActions { get; set; }
+
+    [Parameter]
+    public RenderFragment? EmptyActions { get; set; }
+
+    [Parameter]
+    public RenderFragment? LoadingContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

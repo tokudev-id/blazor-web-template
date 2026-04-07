@@ -1,0 +1,40 @@
+@inject NavigationManager NavigationManager
+
+@if (_showAccessDenied)
+{
+    <PageSection Section="Authorization"
+                 Title="Access denied"
+                 Subtitle="Your account is signed in, but the current role does not allow access to this module.">
+        <MudButton Href="@AppRoutes.Dashboard" Variant="Variant.Filled" Color="Color.Primary">Back to dashboard</MudButton>
+    </PageSection>
+}
+else
+{
+    <PageSection Section="Authentication"
+                 Title="Redirecting to sign-in"
+                 Subtitle="You need to sign in before opening this screen.">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+    </PageSection>
+}
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    private bool _showAccessDenied;
+
+    protected override void OnInitialized()
+    {
+        var isAuthenticated = HttpContext?.User.Identity?.IsAuthenticated == true;
+
+        if (isAuthenticated)
+        {
+            _showAccessDenied = true;
+            return;
+        }
+
+        var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        var localReturnUrl = string.IsNullOrWhiteSpace(relativePath) ? AppRoutes.Dashboard : $"/{relativePath}";
+        NavigationManager.NavigateTo(AppRoutes.LoginWithReturnUrl(localReturnUrl), forceLoad: true);
+    }
+}

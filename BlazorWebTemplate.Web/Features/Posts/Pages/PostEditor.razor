@@ -1,0 +1,46 @@
+@page "/posts/new"
+@page "/posts/{Id:int}/edit"
+@attribute [Authorize(Policy = AppPolicies.EditorOrAbove)]
+
+<PageTitle>@(IsEditMode ? "Edit post" : "Create post")</PageTitle>
+
+<NavigationLock ConfirmExternalNavigation="@IsDirty" OnBeforeInternalNavigation="@(async context => await ConfirmNavigateAsync(context))" />
+
+<MudStack Spacing="3">
+    <PageHeader Title="@(IsEditMode ? "Edit post" : "Create post")"
+                Section="Post editor"
+                Subtitle="Form validation stays in the Web layer while write orchestration remains in the backend service."
+                Breadcrumbs="@_breadcrumbs">
+        <Actions>
+            <MudButton Href="@AppRoutes.Posts" Variant="Variant.Outlined" Color="Color.Secondary">Cancel</MudButton>
+        </Actions>
+    </PageHeader>
+
+    <StateView ErrorMessage="@_loadErrorMessage">
+        <ChildContent>
+            <PageSection Section="Draft"
+                         Title="@(IsEditMode ? "Refine content details" : "Create a new content draft")"
+                         Subtitle="Enterprise forms should be explicit, resilient, and safe to navigate away from.">
+                @if (!string.IsNullOrWhiteSpace(_saveErrorMessage))
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">@_saveErrorMessage</MudAlert>
+                }
+
+                <EditForm Model="Model" FormName="post-editor-form" method="post" OnValidSubmit="HandleSubmitAsync">
+                    <DataAnnotationsValidator />
+                    <MudStack Spacing="2">
+                        <MudTextField T="string" Label="Title" Variant="Variant.Outlined" @bind-Value="Model.Title" For="@(() => Model.Title)" />
+                        <MudTextField T="string" Label="Tags" Variant="Variant.Outlined" HelperText="Use comma-separated tags, for example cms, workflow, governance." @bind-Value="Model.Tags" For="@(() => Model.Tags)" />
+                        <MudTextField T="string" Label="Body" Variant="Variant.Outlined" Lines="12" @bind-Value="Model.Body" For="@(() => Model.Body)" />
+                        <MudStack Row="true" Spacing="2">
+                            <MudButton Href="@AppRoutes.Posts" Variant="Variant.Outlined" Color="Color.Secondary">Cancel</MudButton>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="@_isSubmitting">
+                                @(_isSubmitting ? "Saving..." : IsEditMode ? "Save changes" : "Create post")
+                            </MudButton>
+                        </MudStack>
+                    </MudStack>
+                </EditForm>
+            </PageSection>
+        </ChildContent>
+    </StateView>
+</MudStack>

@@ -1,0 +1,35 @@
+<MudStack Class="app-sidebar" Spacing="3">
+    <MudPaper Elevation="0" Class="app-sidebar__brand">
+        <MudText Typo="Typo.overline" Class="app-sidebar__eyebrow">@Brand.CompanyName</MudText>
+        <MudText Typo="Typo.h4">@Brand.ProductName</MudText>
+        <MudText Typo="Typo.body2" Class="app-sidebar__description">@Brand.ProductDescription</MudText>
+    </MudPaper>
+
+    <AuthorizeView>
+        <Authorized Context="shellAuth">
+            <MudNavMenu Rounded="true" Dense="true" Class="app-sidebar__nav">
+                <MudText Typo="Typo.overline" Class="app-sidebar__group">Workspace</MudText>
+                <MudNavLink Href="@AppRoutes.Dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.SpaceDashboard">Dashboard</MudNavLink>
+                <MudNavLink Href="@AppRoutes.Posts" Icon="@Icons.Material.Rounded.Article">Posts</MudNavLink>
+                <MudNavLink Href="@AppRoutes.Categories" Icon="@Icons.Material.Rounded.GridView">Categories</MudNavLink>
+
+                <MudText Typo="Typo.overline" Class="app-sidebar__group">Administration</MudText>
+                <AuthorizeView Roles="@RoleNames.Admin">
+                    <Authorized Context="adminAuth">
+                        <MudNavLink Href="@AppRoutes.Users" Icon="@Icons.Material.Rounded.People">Users</MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
+            </MudNavMenu>
+        </Authorized>
+        <NotAuthorized>
+            <MudNavMenu Rounded="true" Dense="true" Class="app-sidebar__nav">
+                <MudNavLink Href="@AppRoutes.Login" Icon="@Icons.Material.Rounded.Login">Login</MudNavLink>
+            </MudNavMenu>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <MudPaper Elevation="0" Class="app-sidebar__note">
+        <MudText Typo="Typo.overline" Class="app-sidebar__group">Platform defaults</MudText>
+        <MudText Typo="Typo.body2">Reusable page primitives, validated options, retry-aware HTTP clients, and clean Web/Client boundaries ship together in this starter.</MudText>
+    </MudPaper>
+</MudStack>

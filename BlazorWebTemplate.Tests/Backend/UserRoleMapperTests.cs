@@ -1,4 +1,4 @@
-using BlazorWebTemplate.Backend.Mapping;
+using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Mapping;
 using BlazorWebTemplate.Shared.Auth;
 
 namespace BlazorWebTemplate.Tests.Backend;

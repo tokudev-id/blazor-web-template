@@ -1,0 +1,19 @@
+@page "/error"
+@attribute [AllowAnonymous]
+
+<PageTitle>Error</PageTitle>
+
+<PageSection Section="Failure"
+             Title="An unexpected error interrupted the request."
+             Subtitle="The template keeps this fallback safe by avoiding detailed exception output outside development.">
+    @if (ShowRequestId)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">
+            Request ID: @RequestId
+        </MudAlert>
+    }
+
+    <MudStack Row="true" Spacing="2">
+        <MudButton Href="@AppRoutes.Dashboard" Variant="Variant.Filled" Color="Color.Primary">Return to dashboard</MudButton>
+    </MudStack>
+</PageSection>

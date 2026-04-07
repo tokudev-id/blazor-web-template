@@ -1,0 +1,28 @@
+<MudPaper Elevation="0" Class="@($"app-stat-card {(Featured ? "app-stat-card--featured" : string.Empty)} {Class}")">
+    <div class="app-stat-card__icon">
+        <MudIcon Icon="@Icon" Size="Size.Medium" />
+    </div>
+    <MudText Typo="Typo.overline" Class="app-stat-card__label">@Label</MudText>
+    <MudText Typo="Typo.h3">@Value</MudText>
+    <MudText Typo="Typo.body2" Class="app-text-muted">@Description</MudText>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Icon { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool Featured { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

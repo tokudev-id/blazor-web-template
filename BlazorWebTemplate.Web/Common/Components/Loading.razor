@@ -1,0 +1,8 @@
+<MudPaper Elevation="0" Class="app-card app-state-card">
+    <MudSkeleton Height="@Height" Class="app-skeleton" />
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string Height { get; set; } = "220px";
+}

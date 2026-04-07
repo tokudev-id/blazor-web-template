@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebTemplate.Web", "BlazorWebTemplate.Web\BlazorWebTemplate.Web.csproj", "{8A65C7C9-DD3A-40E5-87FC-A6D10AAE2294}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebTemplate.Backend", "BlazorWebTemplate.Backend\BlazorWebTemplate.Backend.csproj", "{3128FF99-E5D5-452D-9AED-512C0FE9137B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebTemplate.Client", "BlazorWebTemplate.Client\BlazorWebTemplate.Client.csproj", "{3128FF99-E5D5-452D-9AED-512C0FE9137B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWebTemplate.Shared", "BlazorWebTemplate.Shared\BlazorWebTemplate.Shared.csproj", "{A4F9F5DA-7F23-45F9-ABF2-CCC2B99E9A78}"
 EndProject

@@ -1,0 +1,57 @@
+@page "/posts/{Id:int}"
+@attribute [Authorize]
+
+<PageTitle>Post details</PageTitle>
+
+@if (_isLoading)
+{
+    <Loading Height="320px" />
+}
+else if (!string.IsNullOrWhiteSpace(_errorMessage))
+{
+    <ErrorViewer Message="@_errorMessage" />
+}
+else if (_post is not null)
+{
+    <MudStack Spacing="3">
+        <PageHeader Title="@_post.Title"
+                    Section="Post details"
+                    Subtitle="Review the full content record, metadata, and available actions."
+                    Breadcrumbs="@_breadcrumbs">
+            <Actions>
+                <MudStack Row="true" Spacing="1">
+                    <MudButton Href="@AppRoutes.Posts" Variant="Variant.Outlined" Color="Color.Primary">Back to posts</MudButton>
+                    <AuthorizeView Policy="@AppPolicies.EditorOrAbove">
+                        <Authorized>
+                            <MudButton Href="@AppRoutes.PostEdit(Id)" Variant="Variant.Filled" Color="Color.Primary">Edit</MudButton>
+                            <MudButton Href="@AppRoutes.PostDelete(Id)" Variant="Variant.Outlined" Color="Color.Error">Delete</MudButton>
+                        </Authorized>
+                    </AuthorizeView>
+                </MudStack>
+            </Actions>
+        </PageHeader>
+
+        <PageSection Section="Metadata"
+                     Title="Content snapshot"
+                     Subtitle="Key ownership and engagement indicators for this content record.">
+            <MudStack Row="true" Spacing="2" Class="app-metadata">
+                <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small">@_post.AuthorName</MudChip>
+                <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small">@_post.Views views</MudChip>
+                <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small">@_post.Likes likes</MudChip>
+                <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small">@_post.Dislikes dislikes</MudChip>
+            </MudStack>
+            <MudStack Row="true" Spacing="1">
+                @foreach (var tag in _post.Tags)
+                {
+                    <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small" Href="@AppRoutes.PostsByTag(tag)">@tag</MudChip>
+                }
+            </MudStack>
+        </PageSection>
+
+        <PageSection Section="Body"
+                     Title="Post body"
+                     Subtitle="The content payload shown here is the exact value returned by the backend adapter.">
+            <MudText Typo="Typo.body1">@_post.Body</MudText>
+        </PageSection>
+    </MudStack>
+}

@@ -1,0 +1,80 @@
+@page "/login"
+@attribute [AllowAnonymous]
+
+<PageTitle>Login</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="app-login">
+    <MudGrid Spacing="4" Class="app-login__grid">
+        <MudItem xs="12" lg="6">
+            <PageSection Section="@Brand.CompanyName"
+                         Title="@Brand.ProductName"
+                         Subtitle="@Brand.ProductDescription"
+                         Class="app-login__brand-panel">
+                <MudText Typo="Typo.h2">Operational UI that scales beyond the demo stage.</MudText>
+                <MudText Typo="Typo.body1" Class="app-text-muted">
+                    The shell is built around reusable cards, tables, state views, validated options, and clean backend boundaries so teams can white-label it without reworking the core.
+                </MudText>
+                <MudStack Spacing="1" Class="app-login__benefits">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIcon Icon="@Icons.Material.Rounded.VerifiedUser" Color="Color.Primary" Size="Size.Small" />
+                        <MudText Typo="Typo.body2">Role-aware navigation and protected modules.</MudText>
+                    </MudStack>
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIcon Icon="@Icons.Material.Rounded.Api" Color="Color.Primary" Size="Size.Small" />
+                        <MudText Typo="Typo.body2">Retry-aware backend adapters with correlation headers.</MudText>
+                    </MudStack>
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIcon Icon="@Icons.Material.Rounded.Widgets" Color="Color.Primary" Size="Size.Small" />
+                        <MudText Typo="Typo.body2">Reusable enterprise-grade page primitives.</MudText>
+                    </MudStack>
+                </MudStack>
+                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
+                    Demo account: <strong>emilys</strong> / <strong>emilyspass</strong>
+                </MudAlert>
+            </PageSection>
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <PageSection Section="Authentication"
+                         Title="Sign in"
+                         Subtitle="Start a secure cookie-backed session and open the operations workspace."
+                         Class="app-login__form-panel">
+
+                @if (!string.IsNullOrWhiteSpace(_errorMessage))
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">@_errorMessage</MudAlert>
+                }
+
+                <form method="post" action="@AppRoutes.AccountLogin" class="app-auth-form">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                    <MudStack Spacing="2">
+                        <MudTextField T="string"
+                                      name="Username"
+                                      Label="Username"
+                                      Variant="Variant.Outlined"
+                                      Value="@_username"
+                                      ValueChanged="@(value => _username = value ?? string.Empty)"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Rounded.Person" />
+                        <MudTextField T="string"
+                                      name="Password"
+                                      Label="Password"
+                                      Variant="Variant.Outlined"
+                                      InputType="InputType.Password"
+                                      Value="@_password"
+                                      ValueChanged="@(value => _password = value ?? string.Empty)"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Rounded.Lock" />
+                        <MudButton Color="Color.Primary"
+                                   Variant="Variant.Filled"
+                                   Size="Size.Large"
+                                   FullWidth="true"
+                                   ButtonType="ButtonType.Submit">
+                            Open workspace
+                        </MudButton>
+                    </MudStack>
+                </form>
+            </PageSection>
+        </MudItem>
+    </MudGrid>
+</MudContainer>

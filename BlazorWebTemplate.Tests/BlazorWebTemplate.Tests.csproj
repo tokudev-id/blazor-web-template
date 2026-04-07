@@ -21,8 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlazorWebTemplate.Backend\BlazorWebTemplate.Backend.csproj" />
+    <ProjectReference Include="..\BlazorWebTemplate.Client\BlazorWebTemplate.Client.csproj" />
     <ProjectReference Include="..\BlazorWebTemplate.Shared\BlazorWebTemplate.Shared.csproj" />
+    <ProjectReference Include="..\BlazorWebTemplate.Web\BlazorWebTemplate.Web.csproj" />
   </ItemGroup>
 
 </Project>

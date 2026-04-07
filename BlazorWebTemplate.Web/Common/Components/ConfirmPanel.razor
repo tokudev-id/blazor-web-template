@@ -1,0 +1,47 @@
+<MudPaper Elevation="0" Class="@($"app-card app-confirm-panel {Class}")">
+    <MudText Typo="Typo.overline" Class="app-card__section">@Section</MudText>
+    <MudText Typo="Typo.h4">@Title</MudText>
+    <MudText Typo="Typo.body2" Class="app-text-muted">@Message</MudText>
+
+    @if (HighlightContent is not null)
+    {
+        <div class="app-confirm-panel__content">
+            @HighlightContent
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(WarningMessage))
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense="true" Icon="@Icons.Material.Rounded.WarningAmber">
+            @WarningMessage
+        </MudAlert>
+    }
+
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string Section { get; set; } = "Confirmation";
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Message { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? WarningMessage { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? HighlightContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,45 @@
+@page "/users"
+@attribute [Authorize(Policy = AppPolicies.AdminOnly)]
+
+<PageTitle>Users</PageTitle>
+
+<MudStack Spacing="3">
+    <PageHeader Title="Users"
+                Section="Administration"
+                Subtitle="Inspect people, roles, and ownership context in an admin-only workspace."
+                Breadcrumbs="@_breadcrumbs" />
+
+    <DataGridShell TItem="UserSummary"
+                   Section="Directory"
+                   Title="People directory"
+                   Subtitle="This module demonstrates role-aware administration views on top of shared list primitives."
+                   Items="@_users"
+                   ErrorMessage="@_errorMessage"
+                   IsLoading="@_isLoading"
+                   EmptyTitle="No users matched"
+                   EmptyMessage="Try a broader search term to expand the directory results.">
+        <ToolbarContent>
+            <PageToolbar>
+                <MudTextField T="string" Label="Search users" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_searchInput" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ApplySearch">Search</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="ClearSearch">Clear</MudButton>
+            </PageToolbar>
+        </ToolbarContent>
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Username</MudTh>
+            <MudTh>Role</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Company</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.DisplayName</MudTd>
+            <MudTd DataLabel="Username">@context.Username</MudTd>
+            <MudTd DataLabel="Role">
+                <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">@context.Role</MudChip>
+            </MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Company">@context.CompanyName</MudTd>
+        </RowTemplate>
+    </DataGridShell>
+</MudStack>
