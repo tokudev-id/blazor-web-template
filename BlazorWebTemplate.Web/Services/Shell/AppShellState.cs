@@ -5,7 +5,7 @@ namespace BlazorWebTemplate.Web.Services.Shell;
 
 public sealed class AppShellState
 {
-    private List<AppShellBreadcrumb> _breadcrumbs = [new("Dashboard", AppRoutes.Dashboard)];
+    private List<AppShellBreadcrumb> _breadcrumbs = [new("Dashboard", CommonRouteFor.Dashboard)];
 
     public bool IsDrawerOpen { get; private set; } = true;
 

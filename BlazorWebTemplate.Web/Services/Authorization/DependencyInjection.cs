@@ -1,4 +1,4 @@
-using BlazorWebTemplate.Shared.Auth;
+using BlazorWebTemplate.Shared.Services.Authorization.Constants;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlazorWebTemplate.Web.Services.Authorization;
@@ -9,8 +9,8 @@ public static class DependencyInjection
     {
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(AppPolicies.AdminOnly, policy => policy.RequireRole(RoleNames.Admin));
-            options.AddPolicy(AppPolicies.EditorOrAbove, policy => policy.RequireRole(RoleNames.Admin, RoleNames.Editor));
+            options.AddPolicy(AppPolicyFor.AdminOnly, policy => policy.RequireRole(RoleNameFor.Admin));
+            options.AddPolicy(AppPolicyFor.EditorOrAbove, policy => policy.RequireRole(RoleNameFor.Admin, RoleNameFor.Editor));
         });
 
         return services;

@@ -1,11 +1,10 @@
 using BlazorWebTemplate.Client.Services.BackEnd.Auth;
-using BlazorWebTemplate.Client.Services.BackEnd.Categories;
 using BlazorWebTemplate.Client.Services.BackEnd.Dashboard;
+using BlazorWebTemplate.Client.Services.BackEnd.Rbac;
 using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Mapping;
 using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Http;
-using BlazorWebTemplate.Client.Services.BackEnd.Posts;
-using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Session;
 using BlazorWebTemplate.Client.Services.BackEnd.Users;
+using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Session;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -14,8 +13,8 @@ namespace BlazorWebTemplate.Client.Services.BackEnd;
 
 public static class DependencyInjection
 {
-    public const string ApiClientName = "DummyJson.Api";
-    public const string AuthClientName = "DummyJson.Auth";
+    public const string ApiClientName = "UnictiveApi.Api";
+    public const string AuthClientName = "UnictiveApi.Auth";
 
     public static IServiceCollection AddBackEndServices(this IServiceCollection services, IConfiguration configuration)
     {
@@ -42,16 +41,14 @@ public static class DependencyInjection
             .AddHttpMessageHandler<TokenRefreshHandler>();
 
         services.AddScoped<IAuthApi, AuthApi>();
-        services.AddScoped<IPostApi, PostApi>();
-        services.AddScoped<ICategoryApi, CategoryApi>();
         services.AddScoped<IUserApi, UserApi>();
+        services.AddScoped<IRbacApi, RbacApi>();
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<IPostService, PostService>();
-        services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IRbacService, RbacService>();
 
         return services;
     }

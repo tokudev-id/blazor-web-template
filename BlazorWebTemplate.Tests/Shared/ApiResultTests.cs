@@ -1,4 +1,5 @@
-using BlazorWebTemplate.Shared.Common;
+using BlazorWebTemplate.Shared.Common.Constants;
+using BlazorWebTemplate.Shared.Common.Responses;
 
 namespace BlazorWebTemplate.Tests.Shared;
 

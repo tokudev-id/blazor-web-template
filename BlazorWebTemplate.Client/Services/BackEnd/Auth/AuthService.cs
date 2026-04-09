@@ -1,20 +1,21 @@
-using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Mapping;
 using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Session;
-using BlazorWebTemplate.Shared.Auth;
-using BlazorWebTemplate.Shared.Common;
+using BlazorWebTemplate.Shared.Common.Constants;
+using BlazorWebTemplate.Shared.Common.Responses;
+using BlazorWebTemplate.Shared.Services.Authentication.Commands.Login;
+using BlazorWebTemplate.Shared.Services.Authentication.Models;
+using BlazorWebTemplate.Shared.Services.Authorization.Constants;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Auth;
 
 internal sealed class AuthService(
     IAuthApi authApiClient,
-    ITokenStore tokenStore,
-    IUserRoleMapper roleMapper) : IAuthService
+    ITokenStore tokenStore) : IAuthService
 {
     public async Task<ApiResult<AppUser>> LoginAsync(LoginCommand command, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(command.Username) || string.IsNullOrWhiteSpace(command.Password))
+        if (string.IsNullOrWhiteSpace(command.Email) || string.IsNullOrWhiteSpace(command.Password))
         {
-            return ApiResult<AppUser>.Failure(new ApiError(ApiErrorCodes.Validation, "Username and password are required."));
+            return ApiResult<AppUser>.Failure(new ApiError(ApiErrorCodes.Validation, "Email and password are required."));
         }
 
         var loginResult = await authApiClient.LoginAsync(command, cancellationToken);
@@ -30,11 +31,8 @@ internal sealed class AuthService(
         }
 
         var user = MapUser(meResult.Value);
-        var session = new AccessSession(
-            loginResult.Value.AccessToken,
-            loginResult.Value.RefreshToken,
-            DateTimeOffset.UtcNow.AddMinutes(30),
-            user);
+        var expiresAt = new DateTimeOffset(loginResult.Value.ExpiresAt, TimeSpan.Zero);
+        var session = new AccessSession(loginResult.Value.AccessToken, loginResult.Value.RefreshToken, expiresAt, user);
 
         await tokenStore.StoreAsync(session, cancellationToken);
         return ApiResult<AppUser>.Success(user);
@@ -51,15 +49,18 @@ internal sealed class AuthService(
     public Task LogoutAsync(CancellationToken cancellationToken = default)
         => tokenStore.ClearAsync(cancellationToken);
 
-    private AppUser MapUser(DummyJsonCurrentUserDto dto)
+    private static AppUser MapUser(UnictiveCurrentUserDto dto)
     {
-        var displayName = string.Join(' ', new[] { dto.FirstName, dto.LastName }.Where(static part => !string.IsNullOrWhiteSpace(part)));
+        var displayName = string.IsNullOrWhiteSpace(dto.FullName)
+            ? string.Join(' ', new[] { dto.FirstName, dto.LastName }.Where(static p => !string.IsNullOrWhiteSpace(p)))
+            : dto.FullName;
+
         return new AppUser(
             dto.Id,
-            dto.Username,
-            string.IsNullOrWhiteSpace(displayName) ? dto.Username : displayName,
             dto.Email,
-            roleMapper.MapToAppRole(dto.Role),
-            dto.Image);
+            string.IsNullOrWhiteSpace(displayName) ? dto.Email : displayName,
+            dto.Email,
+            dto.Roles.FirstOrDefault() ?? RoleNameFor.Viewer,
+            null);
     }
 }

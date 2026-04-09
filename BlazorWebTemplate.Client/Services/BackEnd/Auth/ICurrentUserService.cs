@@ -1,4 +1,4 @@
-using BlazorWebTemplate.Shared.Auth;
+using BlazorWebTemplate.Shared.Services.Authentication.Models;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Auth;
 

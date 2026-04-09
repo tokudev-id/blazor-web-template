@@ -1,4 +1,4 @@
-using BlazorWebTemplate.Shared.Auth;
+using BlazorWebTemplate.Shared.Services.Authorization.Constants;
 using BlazorWebTemplate.Web.Services;
 using BlazorWebTemplate.Web.Services.AppInfo;
 using BlazorWebTemplate.Web.Services.Shell;
@@ -38,7 +38,7 @@ public sealed class EnterpriseDependencyInjectionTests
         var brandOptions = provider.GetRequiredService<IOptions<AppBrandOptions>>().Value;
         var shellState = provider.GetRequiredService<AppShellState>();
         var policyProvider = provider.GetRequiredService<IAuthorizationPolicyProvider>();
-        var adminPolicy = await policyProvider.GetPolicyAsync(AppPolicies.AdminOnly);
+        var adminPolicy = await policyProvider.GetPolicyAsync(AppPolicyFor.AdminOnly);
 
         Assert.Equal("Control Center", brandOptions.ProductName);
         Assert.NotNull(shellState);

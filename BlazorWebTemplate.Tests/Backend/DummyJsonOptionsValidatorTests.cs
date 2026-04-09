@@ -11,7 +11,7 @@ public sealed class BackEndOptionsValidatorTests
     {
         var result = _validator.Validate(null, new BackEndOptions
         {
-            BaseUrl = "https://dummyjson.com/",
+            BaseUrl = "https://localhost:7001/",
             RequestTimeoutSeconds = 20,
             RetryCount = 2,
             RetryDelayMilliseconds = 250
@@ -25,10 +25,25 @@ public sealed class BackEndOptionsValidatorTests
     {
         var result = _validator.Validate(null, new BackEndOptions
         {
-            BaseUrl = "https://dummyjson.com/",
+            BaseUrl = "https://localhost:7001/",
             RequestTimeoutSeconds = 1,
             RetryCount = 2,
             RetryDelayMilliseconds = 250
+        });
+
+        Assert.False(result.Succeeded);
+    }
+
+    [Fact]
+    public void Validate_ReturnsFailureForZeroPageSize()
+    {
+        var result = _validator.Validate(null, new BackEndOptions
+        {
+            BaseUrl = "https://localhost:7001/",
+            RequestTimeoutSeconds = 20,
+            RetryCount = 2,
+            RetryDelayMilliseconds = 250,
+            DefaultPageSize = 0
         });
 
         Assert.False(result.Succeeded);

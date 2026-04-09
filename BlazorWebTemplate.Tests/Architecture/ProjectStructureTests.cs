@@ -59,8 +59,7 @@ public sealed class ProjectStructureTests
         Assert.True(Directory.Exists(Path.Combine(webRoot, "Common")));
         Assert.True(Directory.Exists(Path.Combine(webRoot, "Layouts")));
         Assert.True(Directory.Exists(Path.Combine(webRoot, "Services")));
-        Assert.True(Directory.Exists(Path.Combine(webRoot, "Features", "Posts", "Pages")));
-        Assert.True(Directory.Exists(Path.Combine(webRoot, "Features", "Posts", "State")));
+        Assert.True(Directory.Exists(Path.Combine(webRoot, "Features", "Users", "Pages")));
     }
 
     [Fact]

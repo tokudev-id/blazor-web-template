@@ -17,30 +17,18 @@ else if (_summary is not null)
     <MudStack Spacing="3">
         <PageHeader Title="Operations overview"
                     Section="Workspace"
-                    Subtitle="A clean enterprise shell for content volume, team access, and workflow signals."
+                    Subtitle="A clean enterprise shell for user access and workflow signals."
                     Breadcrumbs="@_breadcrumbs" />
 
         <MudGrid Spacing="3">
-            <MudItem xs="12" sm="6" lg="3">
-                <StatCard Icon="@Icons.Material.Rounded.Article"
-                          Label="Posts"
-                          Value="@_summary.TotalPosts.ToString()"
-                          Description="Published and draft-ready content records."
-                          Featured="true" />
-            </MudItem>
-            <MudItem xs="12" sm="6" lg="3">
-                <StatCard Icon="@Icons.Material.Rounded.GridView"
-                          Label="Categories"
-                          Value="@_summary.TotalCategories.ToString()"
-                          Description="Taxonomy groups available across the workspace." />
-            </MudItem>
-            <MudItem xs="12" sm="6" lg="3">
+            <MudItem xs="12" sm="6" lg="6">
                 <StatCard Icon="@Icons.Material.Rounded.People"
                           Label="Users"
                           Value="@_summary.TotalUsers.ToString()"
-                          Description="People available in the current demo directory." />
+                          Description="People available in the current directory."
+                          Featured="true" />
             </MudItem>
-            <MudItem xs="12" sm="6" lg="3">
+            <MudItem xs="12" sm="6" lg="6">
                 <StatCard Icon="@Icons.Material.Rounded.Schedule"
                           Label="Last refresh"
                           Value="@_summary.LastUpdatedUtc.ToLocalTime().ToString("HH:mm")"
@@ -49,42 +37,7 @@ else if (_summary is not null)
         </MudGrid>
 
         <MudGrid Spacing="3">
-            <MudItem xs="12" lg="8">
-                <PageSection Section="Content"
-                             Title="Recent posts"
-                             Subtitle="A quick read on the latest content records in the system.">
-                    <HeaderActions>
-                        <MudButton Href="@AppRoutes.Posts" Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Rounded.ArrowForward">Open module</MudButton>
-                    </HeaderActions>
-                    <ChildContent>
-                        <MudTable T="PostSummary" Items="_summary.RecentPosts" Hover="true" Dense="true" Elevation="0" Class="app-data-table">
-                            <HeaderContent>
-                                <MudTh>Title</MudTh>
-                                <MudTh>Author</MudTh>
-                                <MudTh>Views</MudTh>
-                                <MudTh>Tags</MudTh>
-                            </HeaderContent>
-                            <RowTemplate>
-                                <MudTd DataLabel="Title">
-                                    <MudLink Href="@AppRoutes.PostDetails(context.Id)" Typo="Typo.subtitle2">@context.Title</MudLink>
-                                    <MudText Typo="Typo.body2" Class="app-text-muted">@context.Excerpt</MudText>
-                                </MudTd>
-                                <MudTd DataLabel="Author">@context.AuthorName</MudTd>
-                                <MudTd DataLabel="Views">@context.Views</MudTd>
-                                <MudTd DataLabel="Tags">
-                                    <MudStack Row="true" Spacing="1">
-                                        @foreach (var tag in context.Tags.Take(2))
-                                        {
-                                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@tag</MudChip>
-                                        }
-                                    </MudStack>
-                                </MudTd>
-                            </RowTemplate>
-                        </MudTable>
-                    </ChildContent>
-                </PageSection>
-            </MudItem>
-            <MudItem xs="12" lg="4">
+            <MudItem xs="12">
                 <PageSection Section="Platform"
                              Title="What this template ships"
                              Subtitle="The defaults are designed to be branded, extended, and audited cleanly.">

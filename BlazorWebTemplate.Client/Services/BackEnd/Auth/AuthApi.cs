@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Http;
-using BlazorWebTemplate.Shared.Auth;
-using BlazorWebTemplate.Shared.Common;
+using BlazorWebTemplate.Shared.Common.Responses;
+using BlazorWebTemplate.Shared.Services.Authentication.Commands.Login;
 using Microsoft.Extensions.Logging;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Auth;
@@ -10,43 +10,42 @@ internal sealed class AuthApi(
     IHttpClientFactory httpClientFactory,
     ILogger<AuthApi> logger) : BaseApiService(logger), IAuthApi
 {
-    public async Task<ApiResult<DummyJsonLoginResponseDto>> LoginAsync(LoginCommand command, CancellationToken cancellationToken)
+    public async Task<ApiResult<UnictiveLoginResponseDto>> LoginAsync(LoginCommand command, CancellationToken cancellationToken)
     {
         var client = httpClientFactory.CreateClient(DependencyInjection.AuthClientName);
-        using var request = new HttpRequestMessage(HttpMethod.Post, "auth/login")
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/auth/login")
         {
-            Content = JsonContent.Create(new DummyJsonLoginRequestDto
+            Content = JsonContent.Create(new UnictiveLoginRequestDto
             {
-                Username = command.Username,
+                Email = command.Email,
                 Password = command.Password,
-                ExpiresInMins = 30,
             }),
         };
 
-        return await SendForResultAsync<DummyJsonLoginResponseDto>(client, request, cancellationToken);
+        return await SendForResultAsync<UnictiveLoginResponseDto>(client, request, cancellationToken);
     }
 
-    public async Task<ApiResult<DummyJsonRefreshResponseDto>> RefreshAsync(string refreshToken, CancellationToken cancellationToken)
+    public async Task<ApiResult<UnictiveLoginResponseDto>> RefreshAsync(string accessToken, string refreshToken, CancellationToken cancellationToken)
     {
         var client = httpClientFactory.CreateClient(DependencyInjection.AuthClientName);
-        using var request = new HttpRequestMessage(HttpMethod.Post, "auth/refresh")
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/auth/refresh-token")
         {
-            Content = JsonContent.Create(new DummyJsonRefreshRequestDto
+            Content = JsonContent.Create(new UnictiveRefreshRequestDto
             {
+                AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                ExpiresInMins = 30,
             }),
         };
 
-        return await SendForResultAsync<DummyJsonRefreshResponseDto>(client, request, cancellationToken);
+        return await SendForResultAsync<UnictiveLoginResponseDto>(client, request, cancellationToken);
     }
 
-    public async Task<ApiResult<DummyJsonCurrentUserDto>> GetCurrentUserAsync(string accessToken, CancellationToken cancellationToken)
+    public async Task<ApiResult<UnictiveCurrentUserDto>> GetCurrentUserAsync(string accessToken, CancellationToken cancellationToken)
     {
         var client = httpClientFactory.CreateClient(DependencyInjection.AuthClientName);
-        using var request = new HttpRequestMessage(HttpMethod.Get, "auth/me");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "api/v1/users/me");
         request.SetBearerToken(accessToken);
 
-        return await SendForResultAsync<DummyJsonCurrentUserDto>(client, request, cancellationToken);
+        return await SendForResultAsync<UnictiveCurrentUserDto>(client, request, cancellationToken);
     }
 }

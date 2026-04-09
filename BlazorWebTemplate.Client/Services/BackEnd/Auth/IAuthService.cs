@@ -1,5 +1,6 @@
-using BlazorWebTemplate.Shared.Auth;
-using BlazorWebTemplate.Shared.Common;
+using BlazorWebTemplate.Shared.Common.Responses;
+using BlazorWebTemplate.Shared.Services.Authentication.Commands.Login;
+using BlazorWebTemplate.Shared.Services.Authentication.Models;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Auth;
 

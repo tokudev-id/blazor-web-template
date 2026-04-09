@@ -18,7 +18,7 @@
         <AuthorizeView>
             <Authorized Context="authState">
                 <MudChip T="string" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Class="app-shell__role">
-                    @(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? RoleNames.Viewer)
+                    @(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? RoleNameFor.Viewer)
                 </MudChip>
 
                 <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Dense="true" Class="app-shell__user-menu">
@@ -29,7 +29,7 @@
                     </ActivatorContent>
                     <ChildContent>
                         <MudMenuItem Disabled="true">@Brand.CompanyName</MudMenuItem>
-                        <MudMenuItem Disabled="true">@(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? RoleNames.Viewer)</MudMenuItem>
+                        <MudMenuItem Disabled="true">@(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? RoleNameFor.Viewer)</MudMenuItem>
                         <MudDivider />
                         <div class="app-shell__logout">
                             <LogoutForm />

@@ -1,9 +1,7 @@
 using BlazorWebTemplate.Client;
 using BlazorWebTemplate.Client.Services.BackEnd;
 using BlazorWebTemplate.Client.Services.BackEnd.Auth;
-using BlazorWebTemplate.Client.Services.BackEnd.Categories;
 using BlazorWebTemplate.Client.Services.BackEnd.Dashboard;
-using BlazorWebTemplate.Client.Services.BackEnd.Posts;
 using BlazorWebTemplate.Client.Services.BackEnd.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,10 +18,10 @@ public sealed class ClientDependencyInjectionTests
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["DummyJson:BaseUrl"] = "https://dummyjson.com/",
-                ["DummyJson:RequestTimeoutSeconds"] = "20",
-                ["DummyJson:RetryCount"] = "2",
-                ["DummyJson:RetryDelayMilliseconds"] = "250"
+                ["UnictiveApi:BaseUrl"] = "https://localhost:7001/",
+                ["UnictiveApi:RequestTimeoutSeconds"] = "20",
+                ["UnictiveApi:RetryCount"] = "2",
+                ["UnictiveApi:RetryDelayMilliseconds"] = "250"
             })
             .Build();
 
@@ -35,10 +33,8 @@ public sealed class ClientDependencyInjectionTests
 
         using var provider = services.BuildServiceProvider();
 
-        Assert.Equal("https://dummyjson.com/", provider.GetRequiredService<IOptions<BackEndOptions>>().Value.BaseUrl);
+        Assert.Equal("https://localhost:7001/", provider.GetRequiredService<IOptions<BackEndOptions>>().Value.BaseUrl);
         Assert.NotNull(provider.GetRequiredService<IAuthService>());
-        Assert.NotNull(provider.GetRequiredService<IPostService>());
-        Assert.NotNull(provider.GetRequiredService<ICategoryService>());
         Assert.NotNull(provider.GetRequiredService<IUserService>());
         Assert.NotNull(provider.GetRequiredService<IDashboardService>());
     }

@@ -1,6 +1,7 @@
 using System.Net;
 using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Http;
-using BlazorWebTemplate.Shared.Common;
+using BlazorWebTemplate.Shared.Common.Constants;
+using BlazorWebTemplate.Shared.Common.Responses;
 using Microsoft.Extensions.Logging;
 
 namespace BlazorWebTemplate.Tests.Client;

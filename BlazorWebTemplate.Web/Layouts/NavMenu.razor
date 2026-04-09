@@ -9,21 +9,20 @@
         <Authorized Context="shellAuth">
             <MudNavMenu Rounded="true" Dense="true" Class="app-sidebar__nav">
                 <MudText Typo="Typo.overline" Class="app-sidebar__group">Workspace</MudText>
-                <MudNavLink Href="@AppRoutes.Dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.SpaceDashboard">Dashboard</MudNavLink>
-                <MudNavLink Href="@AppRoutes.Posts" Icon="@Icons.Material.Rounded.Article">Posts</MudNavLink>
-                <MudNavLink Href="@AppRoutes.Categories" Icon="@Icons.Material.Rounded.GridView">Categories</MudNavLink>
+                <MudNavLink Href="@CommonRouteFor.Dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.SpaceDashboard">Dashboard</MudNavLink>
 
                 <MudText Typo="Typo.overline" Class="app-sidebar__group">Administration</MudText>
-                <AuthorizeView Roles="@RoleNames.Admin">
+                <AuthorizeView Roles="@RoleNameFor.Admin">
                     <Authorized Context="adminAuth">
-                        <MudNavLink Href="@AppRoutes.Users" Icon="@Icons.Material.Rounded.People">Users</MudNavLink>
+                        <MudNavLink Href="@UsersRouteFor.Index" Icon="@Icons.Material.Rounded.People">Users</MudNavLink>
+                        <MudNavLink Href="@RbacRouteFor.Index" Icon="@Icons.Material.Rounded.AdminPanelSettings">Roles</MudNavLink>
                     </Authorized>
                 </AuthorizeView>
             </MudNavMenu>
         </Authorized>
         <NotAuthorized>
             <MudNavMenu Rounded="true" Dense="true" Class="app-sidebar__nav">
-                <MudNavLink Href="@AppRoutes.Login" Icon="@Icons.Material.Rounded.Login">Login</MudNavLink>
+                <MudNavLink Href="@CommonRouteFor.Login" Icon="@Icons.Material.Rounded.Login">Login</MudNavLink>
             </MudNavMenu>
         </NotAuthorized>
     </AuthorizeView>

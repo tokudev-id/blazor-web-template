@@ -1,0 +1,99 @@
+@page "/roles"
+@attribute [Authorize(Policy = AppPolicyFor.AdminOnly)]
+
+<PageTitle>Roles</PageTitle>
+
+<MudStack Spacing="3">
+    <PageHeader Title="Roles &amp; Permissions"
+                Section="Administration"
+                Subtitle="Define custom roles, inspect available permissions, and control access across the workspace."
+                Breadcrumbs="@_breadcrumbs" />
+
+    <MudGrid Spacing="3">
+
+        <MudItem xs="12" lg="5">
+            <PageSection Section="System"
+                         Title="Available permissions"
+                         Subtitle="All permissions registered in the backend. Assign them to roles during creation.">
+                @if (_permissionsLoading)
+                {
+                    <Loading Height="80px" />
+                }
+                else if (!string.IsNullOrWhiteSpace(_permissionsError))
+                {
+                    <StateView ErrorMessage="@_permissionsError" />
+                }
+                else if (_permissions.Count == 0)
+                {
+                    <StateView IsEmpty="true"
+                               EmptyTitle="No permissions found"
+                               EmptyMessage="The backend has no registered permissions yet." />
+                }
+                else
+                {
+                    <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                        @foreach (var permission in _permissions)
+                        {
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@permission</MudChip>
+                        }
+                    </MudStack>
+                }
+            </PageSection>
+        </MudItem>
+
+        <MudItem xs="12" lg="7">
+            <PageSection Section="Action"
+                         Title="Create role"
+                         Subtitle="Define a new role and attach permissions to it. The role becomes available for assignment immediately.">
+
+                @if (!string.IsNullOrWhiteSpace(_createError))
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-2">@_createError</MudAlert>
+                }
+                @if (!string.IsNullOrWhiteSpace(_createSuccess))
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" Class="mb-2">@_createSuccess</MudAlert>
+                }
+
+                <MudStack Spacing="2">
+                    <MudTextField @bind-Value="_roleName"
+                                  Label="Role name"
+                                  Variant="Variant.Outlined"
+                                  Placeholder="e.g. Moderator"
+                                  Disabled="@_creating" />
+
+                    @if (_permissions.Count > 0)
+                    {
+                        <MudText Typo="Typo.caption" Class="app-text-muted">Select permissions for this role (optional)</MudText>
+                        <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                            @foreach (var permission in _permissions)
+                            {
+                                var isSelected = _selectedPermissions.Contains(permission);
+                                <MudChip T="string"
+                                         Size="Size.Small"
+                                         Variant="@(isSelected ? Variant.Filled : Variant.Outlined)"
+                                         Color="@(isSelected ? Color.Secondary : Color.Default)"
+                                         OnClick="@(() => TogglePermission(permission))"
+                                         Disabled="@_creating">
+                                    @permission
+                                </MudChip>
+                            }
+                        </MudStack>
+                    }
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               OnClick="CreateRoleAsync"
+                               Disabled="@(_creating || string.IsNullOrWhiteSpace(_roleName))">
+                        @if (_creating)
+                        {
+                            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                        }
+                        Create role
+                    </MudButton>
+                </MudStack>
+            </PageSection>
+        </MudItem>
+
+    </MudGrid>
+</MudStack>

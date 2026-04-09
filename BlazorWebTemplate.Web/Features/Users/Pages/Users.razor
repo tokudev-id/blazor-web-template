@@ -1,5 +1,5 @@
 @page "/users"
-@attribute [Authorize(Policy = AppPolicies.AdminOnly)]
+@attribute [Authorize(Policy = AppPolicyFor.AdminOnly)]
 
 <PageTitle>Users</PageTitle>
 
@@ -27,19 +27,29 @@
         </ToolbarContent>
         <HeaderContent>
             <MudTh>Name</MudTh>
-            <MudTh>Username</MudTh>
-            <MudTh>Role</MudTh>
             <MudTh>Email</MudTh>
-            <MudTh>Company</MudTh>
+            <MudTh>Role</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Name">@context.DisplayName</MudTd>
-            <MudTd DataLabel="Username">@context.Username</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
             <MudTd DataLabel="Role">
                 <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">@context.Role</MudChip>
             </MudTd>
-            <MudTd DataLabel="Email">@context.Email</MudTd>
-            <MudTd DataLabel="Company">@context.CompanyName</MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Variant="Variant.Filled" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">
+                    @(context.IsActive ? "Active" : "Inactive")
+                </MudChip>
+            </MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Rounded.ManageAccounts"
+                               Size="Size.Small"
+                               Color="Color.Primary"
+                               Title="Assign role"
+                               OnClick="@(() => OpenAssignRoleDialogAsync(context))" />
+            </MudTd>
         </RowTemplate>
     </DataGridShell>
 </MudStack>

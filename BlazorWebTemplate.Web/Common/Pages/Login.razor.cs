@@ -23,7 +23,7 @@ public partial class Login
     public string? Error { get; set; }
 
     protected string? _errorMessage;
-    protected string _username = string.Empty;
+    protected string _email = string.Empty;
     protected string _password = string.Empty;
     protected AppBrandOptions Brand => BrandOptionsAccessor.Value;
 
@@ -31,7 +31,7 @@ public partial class Login
     {
         if (HttpContext?.User.Identity?.IsAuthenticated == true)
         {
-            NavigationManager.NavigateTo(AppRoutes.Dashboard, forceLoad: true);
+            NavigationManager.NavigateTo(CommonRouteFor.Dashboard, forceLoad: true);
         }
     }
 

@@ -1,8 +1,10 @@
 using BlazorWebTemplate.Client.Services.BackEnd.Users;
-using BlazorWebTemplate.Shared.Users;
-using BlazorWebTemplate.Web.Common.Constants;
+using BlazorWebTemplate.Shared.Users.Queries.GetUsers;
+using BlazorWebTemplate.Web.Features.Rbac.Components;
+using BlazorWebTemplate.Web.Features.Users.Constants;
 using BlazorWebTemplate.Web.Services.Shell;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace BlazorWebTemplate.Web.Features.Users.Pages;
 
@@ -14,10 +16,16 @@ public partial class Users
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
 
+    [Inject]
+    private IDialogService DialogService { get; set; } = default!;
+
+    [Inject]
+    private ISnackbar Snackbar { get; set; } = default!;
+
     [SupplyParameterFromQuery(Name = "search")]
     public string? Search { get; set; }
 
-    protected IReadOnlyList<AppShellBreadcrumb> _breadcrumbs = AppBreadcrumbs.Users();
+    protected IReadOnlyList<AppShellBreadcrumb> _breadcrumbs = BreadcrumbFor.Index();
     protected List<UserSummary> _users = [];
     protected bool _isLoading = true;
     protected string? _errorMessage;
@@ -42,8 +50,26 @@ public partial class Users
     }
 
     protected void ApplySearch()
-        => NavigationManager.NavigateTo(AppRoutes.UsersSearch(_searchInput), forceLoad: true);
+        => NavigationManager.NavigateTo(RouteFor.WithSearch(_searchInput), forceLoad: true);
 
     protected void ClearSearch()
-        => NavigationManager.NavigateTo(AppRoutes.Users, forceLoad: true);
+        => NavigationManager.NavigateTo(RouteFor.Index, forceLoad: true);
+
+    protected async Task OpenAssignRoleDialogAsync(UserSummary user)
+    {
+        var parameters = new DialogParameters<AssignRoleDialog>
+        {
+            { x => x.UserId, user.Id },
+            { x => x.DisplayName, user.DisplayName },
+        };
+
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<AssignRoleDialog>("Assign role", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is string assignedRole)
+        {
+            Snackbar.Add($"Role \"{assignedRole}\" assigned to {user.DisplayName}.", Severity.Success);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
-using BlazorWebTemplate.Shared.Common;
+using BlazorWebTemplate.Shared.Common.Constants;
+using BlazorWebTemplate.Shared.Common.Responses;
 using Microsoft.Extensions.Logging;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Http;
@@ -80,14 +81,22 @@ public abstract class BaseApiService
         }
 
         await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var value = await JsonSerializer.DeserializeAsync<T>(responseStream, SerializerOptions, cancellationToken);
+        var wrapper = await JsonSerializer.DeserializeAsync<ApiResponseWrapper<T>>(responseStream, SerializerOptions, cancellationToken);
 
-        if (value is null)
+        if (wrapper is null)
         {
             return ApiResult<T>.Failure(new ApiError(ApiErrorCodes.RemoteService, "The backend service returned an empty payload."));
         }
 
-        return ApiResult<T>.Success(value);
+        if (!wrapper.Success || wrapper.Data is null)
+        {
+            var message = wrapper.Message
+                ?? (wrapper.Errors?.Count > 0 ? string.Join("; ", wrapper.Errors) : null)
+                ?? "The backend service returned an unsuccessful response.";
+            return ApiResult<T>.Failure(new ApiError(ApiErrorCodes.RemoteService, message));
+        }
+
+        return ApiResult<T>.Success(wrapper.Data);
     }
 
     private async Task<ApiError> CreateApiErrorAsync(HttpResponseMessage response, CancellationToken cancellationToken)
@@ -114,5 +123,13 @@ public abstract class BaseApiService
             response.RequestMessage?.RequestUri);
 
         return new ApiError(code, message, (int)response.StatusCode);
+    }
+
+    private sealed class ApiResponseWrapper<T>
+    {
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public T? Data { get; set; }
+        public List<string>? Errors { get; set; }
     }
 }

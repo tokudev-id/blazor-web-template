@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Security.Claims;
-using BlazorWebTemplate.Shared.Auth;
+using BlazorWebTemplate.Shared.Services.Authentication.Constants;
+using BlazorWebTemplate.Shared.Services.Authentication.Models;
+using BlazorWebTemplate.Shared.Services.Authorization.Constants;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -33,11 +35,11 @@ internal sealed class CookieAuthenticationTokenStore(IHttpContextAccessor httpCo
 
         var principal = authenticateResult.Principal;
         var user = new AppUser(
-            ParseInt(principal.FindFirstValue(ClaimTypes.NameIdentifier)),
+            principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty,
             principal.FindFirstValue(ClaimTypes.Name) ?? string.Empty,
             principal.FindFirstValue("display_name") ?? string.Empty,
             principal.FindFirstValue(ClaimTypes.Email) ?? string.Empty,
-            principal.FindFirstValue(ClaimTypes.Role) ?? RoleNames.Viewer,
+            principal.FindFirstValue(ClaimTypes.Role) ?? RoleNameFor.Viewer,
             principal.FindFirstValue("avatar_url"));
 
         return new AccessSession(accessToken, refreshToken, expiresAtUtc, user);
@@ -96,7 +98,7 @@ internal sealed class CookieAuthenticationTokenStore(IHttpContextAccessor httpCo
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString(CultureInfo.InvariantCulture)),
+            new(ClaimTypes.NameIdentifier, user.Id),
             new(ClaimTypes.Name, user.Username),
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Role, user.Role),
@@ -138,6 +140,4 @@ internal sealed class CookieAuthenticationTokenStore(IHttpContextAccessor httpCo
     private HttpContext GetHttpContext()
         => httpContextAccessor.HttpContext ?? throw new InvalidOperationException("An active HTTP context is required for authentication operations.");
 
-    private static int ParseInt(string? value)
-        => int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0;
 }

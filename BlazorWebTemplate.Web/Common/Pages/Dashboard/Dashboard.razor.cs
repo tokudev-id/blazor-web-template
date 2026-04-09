@@ -1,5 +1,5 @@
 using BlazorWebTemplate.Client.Services.BackEnd.Dashboard;
-using BlazorWebTemplate.Shared.Dashboard;
+using BlazorWebTemplate.Shared.Dashboard.Queries.GetDashboard;
 using BlazorWebTemplate.Web.Common.Constants;
 using BlazorWebTemplate.Web.Services.Shell;
 using Microsoft.AspNetCore.Components;
@@ -14,7 +14,7 @@ public partial class Dashboard
     [Inject]
     private DashboardPageState DashboardState { get; set; } = default!;
 
-    protected IReadOnlyList<AppShellBreadcrumb> _breadcrumbs = AppBreadcrumbs.Dashboard();
+    protected IReadOnlyList<AppShellBreadcrumb> _breadcrumbs = CommonBreadcrumbFor.Dashboard();
     protected DashboardSummary? _summary;
     protected bool _isLoading = true;
     protected string? _errorMessage;

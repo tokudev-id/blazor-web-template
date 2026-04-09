@@ -1,5 +1,5 @@
-using BlazorWebTemplate.Shared.Common;
-using BlazorWebTemplate.Shared.Users;
+using BlazorWebTemplate.Shared.Common.Responses;
+using BlazorWebTemplate.Shared.Users.Queries.GetUsers;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Users;
 

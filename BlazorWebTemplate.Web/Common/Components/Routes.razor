@@ -1,3 +1,11 @@
+@inject Microsoft.Extensions.Options.IOptions<AppBrandOptions> BrandOptionsAccessor
+
+<MudThemeProvider Theme="@_theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<NotificationHost />
+
 <CascadingAuthenticationState>
     <Router AppAssembly="typeof(Program).Assembly">
         <Found Context="routeData">
@@ -15,3 +23,12 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code {
+    private MudTheme _theme = new();
+
+    protected override void OnInitialized()
+    {
+        _theme = AppThemeFactory.Create(BrandOptionsAccessor.Value);
+    }
+}

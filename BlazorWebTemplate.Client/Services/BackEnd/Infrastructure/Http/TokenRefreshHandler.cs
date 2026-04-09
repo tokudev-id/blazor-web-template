@@ -1,6 +1,6 @@
 using BlazorWebTemplate.Client.Services.BackEnd.Auth;
 using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Session;
-using BlazorWebTemplate.Shared.Common;
+using BlazorWebTemplate.Shared.Common.Responses;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Http;
 
@@ -22,8 +22,10 @@ internal sealed class TokenRefreshHandler(
 
         response.Dispose();
 
+        var accessToken = await tokenStore.GetAccessTokenAsync(cancellationToken);
         var refreshToken = await tokenStore.GetRefreshTokenAsync(cancellationToken);
-        if (string.IsNullOrWhiteSpace(refreshToken))
+
+        if (string.IsNullOrWhiteSpace(refreshToken) || string.IsNullOrWhiteSpace(accessToken))
         {
             await tokenStore.ClearAsync(cancellationToken);
             return new HttpResponseMessage(System.Net.HttpStatusCode.Unauthorized)
@@ -33,7 +35,7 @@ internal sealed class TokenRefreshHandler(
             };
         }
 
-        var refreshResult = await authApiClient.RefreshAsync(refreshToken, cancellationToken);
+        var refreshResult = await authApiClient.RefreshAsync(accessToken, refreshToken, cancellationToken);
         if (refreshResult.IsFailure || refreshResult.Value is null)
         {
             await tokenStore.ClearAsync(cancellationToken);
@@ -44,7 +46,7 @@ internal sealed class TokenRefreshHandler(
             };
         }
 
-        var newExpiry = DateTimeOffset.UtcNow.AddMinutes(30);
+        var newExpiry = new DateTimeOffset(refreshResult.Value.ExpiresAt, TimeSpan.Zero);
         await tokenStore.RefreshAsync(refreshResult.Value.AccessToken, refreshResult.Value.RefreshToken, newExpiry, cancellationToken);
 
         clonedRequest.Options.Set(RetryKey, true);

@@ -29,7 +29,7 @@
                     </MudStack>
                 </MudStack>
                 <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
-                    Demo account: <strong>emilys</strong> / <strong>emilyspass</strong>
+                    Register a user via the backend API Swagger UI, then sign in with that email and password.
                 </MudAlert>
             </PageSection>
         </MudItem>
@@ -44,18 +44,19 @@
                     <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">@_errorMessage</MudAlert>
                 }
 
-                <form method="post" action="@AppRoutes.AccountLogin" class="app-auth-form">
+                <form method="post" action="@CommonRouteFor.AccountLogin" class="app-auth-form">
                     <AntiforgeryToken />
                     <input type="hidden" name="returnUrl" value="@ReturnUrl" />
                     <MudStack Spacing="2">
                         <MudTextField T="string"
-                                      name="Username"
-                                      Label="Username"
+                                      name="Email"
+                                      Label="Email"
+                                      InputType="InputType.Email"
                                       Variant="Variant.Outlined"
-                                      Value="@_username"
-                                      ValueChanged="@(value => _username = value ?? string.Empty)"
+                                      Value="@_email"
+                                      ValueChanged="@(value => _email = value ?? string.Empty)"
                                       Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Rounded.Person" />
+                                      AdornmentIcon="@Icons.Material.Rounded.Email" />
                         <MudTextField T="string"
                                       name="Password"
                                       Label="Password"

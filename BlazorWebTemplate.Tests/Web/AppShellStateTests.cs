@@ -21,10 +21,10 @@ public sealed class AppShellStateTests
     {
         var state = new AppShellState();
 
-        state.SetPage("Posts", "Content", [new AppShellBreadcrumb("Dashboard", AppRoutes.Dashboard), new AppShellBreadcrumb("Posts", AppRoutes.Posts)]);
+        state.SetPage("Users", "Administration", [new AppShellBreadcrumb("Dashboard", CommonRouteFor.Dashboard), new AppShellBreadcrumb("Users", "/users")]);
 
-        Assert.Equal("Posts", state.CurrentTitle);
-        Assert.Equal("Content", state.CurrentSection);
+        Assert.Equal("Users", state.CurrentTitle);
+        Assert.Equal("Administration", state.CurrentSection);
         Assert.Equal(2, state.Breadcrumbs.Count);
     }
 }

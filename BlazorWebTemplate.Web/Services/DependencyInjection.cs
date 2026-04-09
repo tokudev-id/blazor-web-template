@@ -16,12 +16,12 @@ public static class DependencyInjection
     public static IServiceCollection AddBlazorWebTemplateWeb(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAppInfoServices(configuration);
-        services.AddAuthenticationServices();
+        services.AddAuthenticationServices(configuration);
         services.AddAuthorizationServices();
         services.AddFrontEndServices();
         services.AddHealthServices();
         services.AddNotificationServices();
-        services.AddShellServices();
+        services.AddShellServices(configuration);
         services.AddUiServices();
         return services;
     }

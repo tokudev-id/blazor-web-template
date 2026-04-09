@@ -5,7 +5,7 @@
     <PageSection Section="Authorization"
                  Title="Access denied"
                  Subtitle="Your account is signed in, but the current role does not allow access to this module.">
-        <MudButton Href="@AppRoutes.Dashboard" Variant="Variant.Filled" Color="Color.Primary">Back to dashboard</MudButton>
+        <MudButton Href="@CommonRouteFor.Dashboard" Variant="Variant.Filled" Color="Color.Primary">Back to dashboard</MudButton>
     </PageSection>
 }
 else
@@ -34,7 +34,7 @@ else
         }
 
         var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        var localReturnUrl = string.IsNullOrWhiteSpace(relativePath) ? AppRoutes.Dashboard : $"/{relativePath}";
-        NavigationManager.NavigateTo(AppRoutes.LoginWithReturnUrl(localReturnUrl), forceLoad: true);
+        var localReturnUrl = string.IsNullOrWhiteSpace(relativePath) ? CommonRouteFor.Dashboard : $"/{relativePath}";
+        NavigationManager.NavigateTo(CommonRouteFor.LoginWithReturnUrl(localReturnUrl), forceLoad: true);
     }
 }

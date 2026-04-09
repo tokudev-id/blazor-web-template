@@ -1,5 +1,5 @@
-using BlazorWebTemplate.Shared.Common;
-using BlazorWebTemplate.Shared.Dashboard;
+using BlazorWebTemplate.Shared.Common.Responses;
+using BlazorWebTemplate.Shared.Dashboard.Queries.GetDashboard;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Dashboard;
 

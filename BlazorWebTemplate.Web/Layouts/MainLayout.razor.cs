@@ -19,7 +19,7 @@ public partial class MainLayout : IDisposable
     protected override void OnInitialized()
     {
         Brand = BrandOptionsAccessor.Value;
-        ShellState.SetPage("Dashboard", "Workspace", AppBreadcrumbs.Dashboard());
+        ShellState.SetPage("Dashboard", "Workspace", CommonBreadcrumbFor.Dashboard());
         ShellState.Changed += HandleShellChanged;
     }
 

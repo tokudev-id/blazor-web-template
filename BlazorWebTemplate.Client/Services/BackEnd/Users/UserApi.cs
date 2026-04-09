@@ -1,21 +1,24 @@
 using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Http;
-using BlazorWebTemplate.Shared.Common;
+using BlazorWebTemplate.Shared.Common.Responses;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Users;
 
 internal sealed class UserApi(
     IHttpClientFactory httpClientFactory,
+    IOptions<BackEndOptions> backEndOptions,
     ILogger<UserApi> logger) : BaseApiService(logger), IUserApi
 {
-    public async Task<ApiResult<DummyJsonUserListResponseDto>> GetUsersAsync(string? search, CancellationToken cancellationToken)
+    public async Task<ApiResult<UnictiveUserListResponseDto>> GetUsersAsync(string? search, CancellationToken cancellationToken)
     {
         var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
+        var pageSize = backEndOptions.Value.DefaultPageSize;
         var path = string.IsNullOrWhiteSpace(search)
-            ? "users?limit=20&skip=0"
-            : $"users/search?q={Uri.EscapeDataString(search)}";
+            ? $"api/v1/admin/user-management?pageNumber=1&pageSize={pageSize}"
+            : $"api/v1/admin/user-management?pageNumber=1&pageSize={pageSize}&searchTerm={Uri.EscapeDataString(search)}";
 
         using var request = new HttpRequestMessage(HttpMethod.Get, path);
-        return await SendForResultAsync<DummyJsonUserListResponseDto>(client, request, cancellationToken);
+        return await SendForResultAsync<UnictiveUserListResponseDto>(client, request, cancellationToken);
     }
 }

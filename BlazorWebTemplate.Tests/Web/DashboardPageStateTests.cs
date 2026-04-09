@@ -1,14 +1,18 @@
-using BlazorWebTemplate.Shared.Dashboard;
+using BlazorWebTemplate.Shared.Dashboard.Queries.GetDashboard;
 using BlazorWebTemplate.Web.Common.Pages.Dashboard;
+using Microsoft.Extensions.Options;
 
 namespace BlazorWebTemplate.Tests.Web;
 
 public sealed class DashboardPageStateTests
 {
+    private static DashboardPageState CreateState(int freshnessMinutes = 2)
+        => new(Options.Create(new AppDashboardOptions { FreshnessMinutes = freshnessMinutes }));
+
     [Fact]
     public void TryGetFreshSummary_ReturnsFalse_WhenEmpty()
     {
-        var state = new DashboardPageState();
+        var state = CreateState();
 
         var found = state.TryGetFreshSummary(out var summary);
 
@@ -19,8 +23,8 @@ public sealed class DashboardPageStateTests
     [Fact]
     public void SetSummary_MakesSummaryAvailable()
     {
-        var state = new DashboardPageState();
-        var summary = new DashboardSummary(10, 4, 2, "Admin", [], DateTimeOffset.UtcNow);
+        var state = CreateState();
+        var summary = new DashboardSummary(2, "Admin", DateTimeOffset.UtcNow);
 
         state.SetSummary(summary);
 

@@ -1,5 +1,5 @@
 using BlazorWebTemplate.Client.Services.BackEnd.Auth;
-using BlazorWebTemplate.Shared.Auth;
+using BlazorWebTemplate.Shared.Services.Authentication.Commands.Login;
 using BlazorWebTemplate.Web.Common.Constants;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +9,7 @@ public static class AuthenticationEndpoints
 {
     public static IEndpointRouteBuilder MapAuthenticationEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost(AppRoutes.AccountLogin, async (
+        endpoints.MapPost(CommonRouteFor.AccountLogin, async (
             [FromForm] LoginCommand command,
             [FromForm] string? returnUrl,
             IAuthService authService) =>
@@ -19,17 +19,17 @@ public static class AuthenticationEndpoints
             if (result.IsFailure)
             {
                 var message = result.Error?.Message ?? "The sign-in attempt could not be completed.";
-                return Results.LocalRedirect(AppRoutes.LoginWithReturnUrl(returnUrl, message));
+                return Results.LocalRedirect(CommonRouteFor.LoginWithReturnUrl(returnUrl, message));
             }
 
             return Results.LocalRedirect(ResolveLocalReturnUrl(returnUrl));
         })
         .AllowAnonymous();
 
-        endpoints.MapPost(AppRoutes.AccountLogout, async (IAuthService authService) =>
+        endpoints.MapPost(CommonRouteFor.AccountLogout, async (IAuthService authService) =>
         {
             await authService.LogoutAsync();
-            return Results.LocalRedirect(AppRoutes.Login);
+            return Results.LocalRedirect(CommonRouteFor.Login);
         });
 
         return endpoints;
@@ -39,11 +39,11 @@ public static class AuthenticationEndpoints
     {
         if (string.IsNullOrWhiteSpace(returnUrl))
         {
-            return AppRoutes.Dashboard;
+            return CommonRouteFor.Dashboard;
         }
 
         return returnUrl.StartsWith('/') && !returnUrl.StartsWith("//", StringComparison.Ordinal)
             ? returnUrl
-            : AppRoutes.Dashboard;
+            : CommonRouteFor.Dashboard;
     }
 }
