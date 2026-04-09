@@ -1,6 +1,6 @@
 # Blazor Web Template
 
-Enterprise-ready Blazor Web App starter built on `.NET 8`, `MudBlazor`, cookie authentication, and a clean `Web → Client → Shared` dependency flow. Backed by the [Unictive Backend API](https://github.com/tokudev-id/boilerplate-dotnet) (`boilerplate-dotnet`).
+Enterprise-ready Blazor Web App starter built on `.NET 8`, `MudBlazor`, cookie authentication, and a clean `Web → Client → Shared` dependency flow. Backed by the [Unictive Backend API](https://bitbucket.org/ptunictive/boilerplate-dotnet) (`boilerplate-dotnet`).
 
 ## Features
 
