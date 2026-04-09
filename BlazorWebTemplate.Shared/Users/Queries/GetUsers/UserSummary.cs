@@ -5,4 +5,6 @@ public sealed record UserSummary(
     string DisplayName,
     string Email,
     string Role,
-    bool IsActive);
+    bool IsActive,
+    string? FirstName = null,
+    string? LastName = null);

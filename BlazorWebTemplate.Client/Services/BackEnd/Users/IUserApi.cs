@@ -4,5 +4,8 @@ namespace BlazorWebTemplate.Client.Services.BackEnd.Users;
 
 internal interface IUserApi
 {
-    Task<ApiResult<UnictiveUserListResponseDto>> GetUsersAsync(string? search, CancellationToken cancellationToken);
+    Task<ApiResult<UnictiveUserListResponseDto>> GetUsersAsync(string? search, int pageNumber, CancellationToken cancellationToken);
+    Task<ApiResult<UnictiveUserDto>> GetUserAsync(string userId, CancellationToken cancellationToken);
+    Task<ApiResult<UnictiveUserDto>> UpdateUserAsync(string userId, UnictiveUpdateUserRequestDto request, CancellationToken cancellationToken);
+    Task<ApiResult> DeleteUserAsync(string userId, CancellationToken cancellationToken);
 }

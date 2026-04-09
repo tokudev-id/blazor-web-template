@@ -24,7 +24,7 @@ public sealed class DashboardPageStateTests
     public void SetSummary_MakesSummaryAvailable()
     {
         var state = CreateState();
-        var summary = new DashboardSummary(2, "Admin", DateTimeOffset.UtcNow);
+        var summary = new DashboardSummary(2, 1, 1, new Dictionary<string, int>(), "Admin", DateTimeOffset.UtcNow);
 
         state.SetSummary(summary);
 

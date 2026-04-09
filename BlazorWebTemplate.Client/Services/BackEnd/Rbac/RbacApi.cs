@@ -16,6 +16,20 @@ internal sealed class RbacApi(
         return await SendForResultAsync<List<string>>(client, request, cancellationToken);
     }
 
+    public async Task<ApiResult<List<UnictiveRoleDto>>> GetRolesAsync(CancellationToken cancellationToken)
+    {
+        var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
+        using var request = new HttpRequestMessage(HttpMethod.Get, "api/v1/rbac/roles");
+        return await SendForResultAsync<List<UnictiveRoleDto>>(client, request, cancellationToken);
+    }
+
+    public async Task<ApiResult> DeleteRoleAsync(string roleId, CancellationToken cancellationToken)
+    {
+        var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/v1/rbac/roles/{Uri.EscapeDataString(roleId)}");
+        return await SendAsync(client, request, cancellationToken);
+    }
+
     public async Task<ApiResult<Guid>> CreateRoleAsync(string name, IEnumerable<string> permissions, CancellationToken cancellationToken)
     {
         var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);

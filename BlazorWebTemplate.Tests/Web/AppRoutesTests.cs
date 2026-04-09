@@ -19,4 +19,15 @@ public sealed class AppRoutesTests
         Assert.Equal("/users?search=alice", RouteFor.WithSearch("alice"));
         Assert.Equal("/users", RouteFor.WithSearch(string.Empty));
     }
+
+    [Theory]
+    [InlineData("", 1, "/users")]
+    [InlineData("", 2, "/users?page=2")]
+    [InlineData("alice", 1, "/users?search=alice")]
+    [InlineData("alice", 2, "/users?search=alice&page=2")]
+    [InlineData("hello world", 3, "/users?search=hello%20world&page=3")]
+    public void UsersWithSearchAndPage_BuildsExpectedUrl(string search, int page, string expected)
+    {
+        Assert.Equal(expected, RouteFor.WithSearchAndPage(search, page));
+    }
 }

@@ -21,14 +21,26 @@ else if (_summary is not null)
                     Breadcrumbs="@_breadcrumbs" />
 
         <MudGrid Spacing="3">
-            <MudItem xs="12" sm="6" lg="6">
+            <MudItem xs="12" sm="6" lg="3">
                 <StatCard Icon="@Icons.Material.Rounded.People"
-                          Label="Users"
+                          Label="Total users"
                           Value="@_summary.TotalUsers.ToString()"
                           Description="People available in the current directory."
                           Featured="true" />
             </MudItem>
-            <MudItem xs="12" sm="6" lg="6">
+            <MudItem xs="12" sm="6" lg="3">
+                <StatCard Icon="@Icons.Material.Rounded.CheckCircle"
+                          Label="Active users"
+                          Value="@_summary.ActiveUsers.ToString()"
+                          Description="Users with an active account status." />
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="3">
+                <StatCard Icon="@Icons.Material.Rounded.Block"
+                          Label="Inactive users"
+                          Value="@_summary.InactiveUsers.ToString()"
+                          Description="Users with a disabled or deactivated account." />
+            </MudItem>
+            <MudItem xs="12" sm="6" lg="3">
                 <StatCard Icon="@Icons.Material.Rounded.Schedule"
                           Label="Last refresh"
                           Value="@_summary.LastUpdatedUtc.ToLocalTime().ToString("HH:mm")"
@@ -36,29 +48,52 @@ else if (_summary is not null)
             </MudItem>
         </MudGrid>
 
-        <MudGrid Spacing="3">
-            <MudItem xs="12">
-                <PageSection Section="Platform"
-                             Title="What this template ships"
-                             Subtitle="The defaults are designed to be branded, extended, and audited cleanly.">
-                    <ChildContent>
-                        <MudStack Spacing="1" Class="app-bullet-list">
-                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                                <MudIcon Icon="@Icons.Material.Rounded.Lock" Color="Color.Primary" Size="Size.Small" />
-                                <MudText Typo="Typo.body2">Cookie auth with route protection and role-aware navigation.</MudText>
+        @if (_summary.RoleDistribution.Count > 0)
+        {
+            <MudGrid Spacing="3">
+                <MudItem xs="12" md="6">
+                    <PageSection Section="Users"
+                                 Title="Role distribution"
+                                 Subtitle="Breakdown of assigned roles across the user directory.">
+                        <ChildContent>
+                            <MudStack Spacing="2">
+                                @foreach (var entry in _summary.RoleDistribution.OrderByDescending(e => e.Value))
+                                {
+                                    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                            <MudIcon Icon="@Icons.Material.Rounded.AdminPanelSettings" Color="Color.Primary" Size="Size.Small" />
+                                            <MudText Typo="Typo.body2">@entry.Key</MudText>
+                                        </MudStack>
+                                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@entry.Value</MudChip>
+                                    </MudStack>
+                                }
                             </MudStack>
-                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                                <MudIcon Icon="@Icons.Material.Rounded.Api" Color="Color.Primary" Size="Size.Small" />
-                                <MudText Typo="Typo.body2">Backend adapters with retry and correlation support.</MudText>
+                        </ChildContent>
+                    </PageSection>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <PageSection Section="Platform"
+                                 Title="What this template ships"
+                                 Subtitle="The defaults are designed to be branded, extended, and audited cleanly.">
+                        <ChildContent>
+                            <MudStack Spacing="1" Class="app-bullet-list">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudIcon Icon="@Icons.Material.Rounded.Lock" Color="Color.Primary" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2">Cookie auth with route protection and role-aware navigation.</MudText>
+                                </MudStack>
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudIcon Icon="@Icons.Material.Rounded.Api" Color="Color.Primary" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2">Backend adapters with retry and correlation support.</MudText>
+                                </MudStack>
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudIcon Icon="@Icons.Material.Rounded.Widgets" Color="Color.Primary" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2">Reusable page, card, table, and confirmation primitives.</MudText>
+                                </MudStack>
                             </MudStack>
-                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                                <MudIcon Icon="@Icons.Material.Rounded.Widgets" Color="Color.Primary" Size="Size.Small" />
-                                <MudText Typo="Typo.body2">Reusable page, card, table, and confirmation primitives.</MudText>
-                            </MudStack>
-                        </MudStack>
-                    </ChildContent>
-                </PageSection>
-            </MudItem>
-        </MudGrid>
+                        </ChildContent>
+                    </PageSection>
+                </MudItem>
+            </MudGrid>
+        }
     </MudStack>
 }

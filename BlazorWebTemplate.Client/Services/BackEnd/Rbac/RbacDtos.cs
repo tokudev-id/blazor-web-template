@@ -10,3 +10,15 @@ internal sealed class UnictiveCreateRoleRequestDto
     [JsonPropertyName("permissions")]
     public List<string> Permissions { get; set; } = [];
 }
+
+internal sealed class UnictiveRoleDto
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonPropertyName("permissions")]
+    public List<string> Permissions { get; set; } = [];
+}

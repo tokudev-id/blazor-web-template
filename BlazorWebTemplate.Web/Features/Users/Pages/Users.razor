@@ -44,12 +44,42 @@
                 </MudChip>
             </MudTd>
             <MudTd>
-                <MudIconButton Icon="@Icons.Material.Rounded.ManageAccounts"
-                               Size="Size.Small"
-                               Color="Color.Primary"
-                               Title="Assign role"
-                               OnClick="@(() => OpenAssignRoleDialogAsync(context))" />
+                <MudStack Row="true" Spacing="0">
+                    <MudIconButton Icon="@Icons.Material.Rounded.ManageAccounts"
+                                   Size="Size.Small"
+                                   Color="Color.Primary"
+                                   Title="Assign role"
+                                   OnClick="@(() => OpenAssignRoleDialogAsync(context))" />
+                    <MudIconButton Icon="@Icons.Material.Rounded.EditNote"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   Title="Edit user"
+                                   OnClick="@(() => OpenEditDialogAsync(context))" />
+                    <MudIconButton Icon="@Icons.Material.Rounded.DeleteOutline"
+                                   Size="Size.Small"
+                                   Color="Color.Error"
+                                   Title="Delete user"
+                                   Disabled="@_deletingUserId.Contains(context.Id)"
+                                   OnClick="@(() => DeleteUserAsync(context))" />
+                </MudStack>
             </MudTd>
         </RowTemplate>
+        <FooterContent>
+            @if (_totalPages > 1)
+            {
+                <div class="d-flex justify-center align-center pa-3">
+                    <MudPagination Count="@_totalPages"
+                                   Selected="@_currentPage"
+                                   SelectedChanged="OnPageChanged"
+                                   Color="Color.Primary"
+                                   Variant="Variant.Outlined"
+                                   ShowFirstButton="true"
+                                   ShowLastButton="true" />
+                    <MudText Typo="Typo.caption" Class="app-text-muted ml-3">
+                        @_totalCount total
+                    </MudText>
+                </div>
+            }
+        </FooterContent>
     </DataGridShell>
 </MudStack>

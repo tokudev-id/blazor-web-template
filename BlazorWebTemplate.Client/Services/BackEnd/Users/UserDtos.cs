@@ -16,6 +16,14 @@ internal sealed class UnictiveUserDto
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
     public bool IsActive { get; set; }
     public string[] Roles { get; set; } = [];
+}
+
+internal sealed class UnictiveUpdateUserRequestDto
+{
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? PhoneNumber { get; set; }
 }

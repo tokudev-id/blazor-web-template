@@ -11,7 +11,7 @@
 
     <MudGrid Spacing="3">
 
-        <MudItem xs="12" lg="5">
+        <MudItem xs="12" lg="4">
             <PageSection Section="System"
                          Title="Available permissions"
                          Subtitle="All permissions registered in the backend. Assign them to roles during creation.">
@@ -41,7 +41,7 @@
             </PageSection>
         </MudItem>
 
-        <MudItem xs="12" lg="7">
+        <MudItem xs="12" lg="4">
             <PageSection Section="Action"
                          Title="Create role"
                          Subtitle="Define a new role and attach permissions to it. The role becomes available for assignment immediately.">
@@ -49,10 +49,6 @@
                 @if (!string.IsNullOrWhiteSpace(_createError))
                 {
                     <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-2">@_createError</MudAlert>
-                }
-                @if (!string.IsNullOrWhiteSpace(_createSuccess))
-                {
-                    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" Class="mb-2">@_createSuccess</MudAlert>
                 }
 
                 <MudStack Spacing="2">
@@ -92,6 +88,60 @@
                         Create role
                     </MudButton>
                 </MudStack>
+            </PageSection>
+        </MudItem>
+
+        <MudItem xs="12" lg="4">
+            <PageSection Section="Directory"
+                         Title="Existing roles"
+                         Subtitle="All roles currently defined in the system.">
+                @if (_rolesLoading)
+                {
+                    <Loading Height="80px" />
+                }
+                else if (!string.IsNullOrWhiteSpace(_rolesError))
+                {
+                    <StateView ErrorMessage="@_rolesError" />
+                }
+                else if (_roles.Count == 0)
+                {
+                    <StateView IsEmpty="true"
+                               EmptyTitle="No roles yet"
+                               EmptyMessage="Create the first role using the form." />
+                }
+                else
+                {
+                    <MudStack Spacing="2">
+                        @foreach (var role in _roles)
+                        {
+                            <MudPaper Elevation="0" Class="app-card pa-3">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                    <div>
+                                        <MudText Typo="Typo.subtitle2">@role.Name</MudText>
+                                        @if (role.Permissions.Count > 0)
+                                        {
+                                            <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1" Class="mt-1">
+                                                @foreach (var perm in role.Permissions)
+                                                {
+                                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default">@perm</MudChip>
+                                                }
+                                            </MudStack>
+                                        }
+                                        else
+                                        {
+                                            <MudText Typo="Typo.caption" Class="app-text-muted">No permissions</MudText>
+                                        }
+                                    </div>
+                                    <MudIconButton Icon="@Icons.Material.Rounded.DeleteOutline"
+                                                   Size="Size.Small"
+                                                   Color="Color.Error"
+                                                   Disabled="@_deletingRoleId.Contains(role.Id)"
+                                                   OnClick="@(() => DeleteRoleAsync(role.Id))" />
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    </MudStack>
+                }
             </PageSection>
         </MudItem>
 

@@ -22,11 +22,21 @@ internal sealed class DashboardService(
             return ApiResult<DashboardSummary>.Failure(usersTask.Result.Error ?? new ApiError(ApiErrorCodes.Unknown, "Unable to load the dashboard users."));
         }
 
-        var users = usersTask.Result.Value ?? [];
+        var paged = usersTask.Result.Value;
         var currentUser = currentUserTask.Result;
+        var items = paged?.Items ?? [];
+
+        var activeUsers = items.Count(u => u.IsActive);
+        var inactiveUsers = items.Count(u => !u.IsActive);
+        var roleDistribution = items
+            .GroupBy(u => u.Role)
+            .ToDictionary(g => g.Key, g => g.Count());
 
         return ApiResult<DashboardSummary>.Success(new DashboardSummary(
-            users.Count,
+            paged?.TotalCount ?? 0,
+            activeUsers,
+            inactiveUsers,
+            roleDistribution,
             currentUser?.Role ?? "Guest",
             DateTimeOffset.UtcNow));
     }

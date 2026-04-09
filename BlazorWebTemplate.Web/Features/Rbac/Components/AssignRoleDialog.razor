@@ -41,10 +41,11 @@
                        @bind-Value="_selectedRole"
                        Label="Role to assign"
                        Variant="Variant.Outlined"
-                       Disabled="@_assigning">
-                <MudSelectItem Value="@("Admin")">Admin</MudSelectItem>
-                <MudSelectItem Value="@("Editor")">Editor</MudSelectItem>
-                <MudSelectItem Value="@("Viewer")">Viewer</MudSelectItem>
+                       Disabled="@(_assigning || _availableRoles.Count == 0)">
+                @foreach (var role in _availableRoles)
+                {
+                    <MudSelectItem Value="@role">@role</MudSelectItem>
+                }
             </MudSelect>
 
         </MudStack>
@@ -75,6 +76,7 @@
     public string DisplayName { get; set; } = string.Empty;
 
     private List<string> _currentRoles = [];
+    private List<string> _availableRoles = [];
     private bool _rolesLoading = true;
     private string _selectedRole = string.Empty;
     private bool _assigning;
@@ -82,10 +84,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await RbacService.GetUserRolesAsync(UserId);
+        var userRolesTask = RbacService.GetUserRolesAsync(UserId);
+        var allRolesTask = RbacService.GetRolesAsync();
+
+        await Task.WhenAll(userRolesTask, allRolesTask);
+
         _rolesLoading = false;
-        if (result.IsSuccess && result.Value is not null)
-            _currentRoles = result.Value;
+
+        if (userRolesTask.Result.IsSuccess && userRolesTask.Result.Value is not null)
+            _currentRoles = userRolesTask.Result.Value;
+
+        if (allRolesTask.Result.IsSuccess && allRolesTask.Result.Value is not null)
+            _availableRoles = allRolesTask.Result.Value.Select(r => r.Name).ToList();
     }
 
     private async Task AssignAsync()
