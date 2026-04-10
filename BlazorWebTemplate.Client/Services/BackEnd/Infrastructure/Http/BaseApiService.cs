@@ -105,9 +105,9 @@ public abstract class BaseApiService
             ? null
             : await response.Content.ReadAsStringAsync(cancellationToken);
 
-        var message = string.IsNullOrWhiteSpace(body)
-            ? response.ReasonPhrase ?? "The backend service returned an error."
-            : body.Length > 220 ? body[..220] : body;
+        var message = ExtractErrorMessage(body)
+            ?? response.ReasonPhrase
+            ?? "The backend service returned an error.";
 
         var code = response.StatusCode switch
         {
@@ -123,6 +123,45 @@ public abstract class BaseApiService
             response.RequestMessage?.RequestUri);
 
         return new ApiError(code, message, (int)response.StatusCode);
+    }
+
+    // Handles both ApiResponse { message, errors[] } and ASP.NET ProblemDetails { title, errors{} } formats.
+    private static string? ExtractErrorMessage(string? body)
+    {
+        if (string.IsNullOrWhiteSpace(body)) return null;
+
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            var root = doc.RootElement;
+
+            // ProblemDetails validation errors: { "errors": { "Field": ["msg1"] } }
+            if (root.TryGetProperty("errors", out var errorsEl) &&
+                errorsEl.ValueKind == JsonValueKind.Object)
+            {
+                var messages = errorsEl.EnumerateObject()
+                    .SelectMany(f => f.Value.ValueKind == JsonValueKind.Array
+                        ? f.Value.EnumerateArray().Select(v => v.GetString()).Where(s => s is not null)
+                        : [])
+                    .ToList();
+
+                if (messages.Count > 0)
+                    return string.Join(" ", messages);
+            }
+
+            // ProblemDetails title
+            if (root.TryGetProperty("title", out var title) &&
+                title.ValueKind == JsonValueKind.String)
+                return title.GetString();
+
+            // ApiResponse message
+            if (root.TryGetProperty("message", out var msg) &&
+                msg.ValueKind == JsonValueKind.String)
+                return msg.GetString();
+        }
+        catch { /* not JSON — fall through */ }
+
+        return body.Length > 220 ? body[..220] : body;
     }
 
     private sealed class ApiResponseWrapper<T>

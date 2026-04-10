@@ -3,8 +3,12 @@ using BlazorWebTemplate.Web;
 using BlazorWebTemplate.Web.Common.Constants;
 using BlazorWebTemplate.Web.Services;
 using BlazorWebTemplate.Web.Services.Authentication;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, loggerConfig) =>
+    loggerConfig.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddClient(builder.Configuration);
 builder.Services.AddBlazorWebTemplateWeb(builder.Configuration);

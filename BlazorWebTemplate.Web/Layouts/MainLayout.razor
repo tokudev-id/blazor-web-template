@@ -1,51 +1,29 @@
 @inherits LayoutComponentBase
 
 <MudLayout Class="app-shell">
-    <MudAppBar Elevation="0" Dense="true" Class="app-shell__appbar">
-        <MudIconButton Icon="@Icons.Material.Rounded.MenuOpen"
-                       Color="Color.Inherit"
-                       OnClick="@ShellState.ToggleDrawer"
-                       Class="app-shell__menu-button"
-                       aria-label="Toggle navigation" />
-
-        <MudStack Spacing="0" Class="app-shell__headline">
-            <MudText Typo="Typo.overline" Class="app-shell__eyebrow">@Brand.ProductName</MudText>
-            <MudText Typo="Typo.subtitle1">@ShellState.CurrentTitle</MudText>
-        </MudStack>
+    <MudAppBar Elevation="0" Dense="true" Class="app-shell__appbar px-4 py-2" Style="height: 64px;">
+        <MudHidden Breakpoint="Breakpoint.MdAndUp">
+            <MudIconButton Icon="@Icons.Material.Rounded.Menu"
+                           Color="Color.Inherit"
+                           OnClick="@ShellState.ToggleDrawer"
+                           Class="app-shell__menu-button"
+                           aria-label="Toggle navigation" />
+        </MudHidden>
 
         <MudSpacer />
 
-        <AuthorizeView>
-            <Authorized Context="authState">
-                <MudChip T="string" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Class="app-shell__role">
-                    @(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? RoleNameFor.Viewer)
-                </MudChip>
-
-                <MudMenu AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight" Dense="true" Class="app-shell__user-menu">
-                    <ActivatorContent>
-                        <MudButton Variant="Variant.Text" Color="Color.Inherit" Class="app-shell__user-button" StartIcon="@Icons.Material.Rounded.AccountCircle">
-                            @(authState.User.FindFirst("display_name")?.Value ?? authState.User.Identity?.Name)
-                        </MudButton>
-                    </ActivatorContent>
-                    <ChildContent>
-                        <MudMenuItem Disabled="true">@Brand.CompanyName</MudMenuItem>
-                        <MudMenuItem Disabled="true">@(authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? RoleNameFor.Viewer)</MudMenuItem>
-                        <MudDivider />
-                        <div class="app-shell__logout">
-                            <LogoutForm />
-                        </div>
-                    </ChildContent>
-                </MudMenu>
-            </Authorized>
-        </AuthorizeView>
+        <MudIconButton Icon="@Icons.Material.Rounded.Notifications" Size="Size.Small" Color="Color.Default" Class="mx-1" />
+        <MudIconButton Icon="@Icons.Material.Rounded.Help" Size="Size.Small" Color="Color.Default" Class="mx-1" />
+        <MudButton Variant="Variant.Text" Color="Color.Primary" Style="font-weight: 600; text-transform: none; margin-left: 8px;">Control Center</MudButton>
     </MudAppBar>
 
     <MudDrawer Open="@ShellState.IsDrawerOpen"
+               OpenChanged="@ShellState.SetDrawer"
                Elevation="0"
-               Width="320px"
+               Width="260px"
                Breakpoint="Breakpoint.Md"
                Variant="DrawerVariant.Responsive"
-               ClipMode="DrawerClipMode.Always"
+               ClipMode="DrawerClipMode.Never"
                Class="app-shell__drawer">
         <NavMenu />
     </MudDrawer>

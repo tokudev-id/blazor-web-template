@@ -48,4 +48,26 @@ internal sealed class AuthApi(
 
         return await SendForResultAsync<UnictiveCurrentUserDto>(client, request, cancellationToken);
     }
+
+    public async Task<ApiResult<UnictiveCurrentUserDto>> UpdateProfileAsync(UnictiveUpdateProfileRequestDto requestDto, CancellationToken cancellationToken)
+    {
+        var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
+        using var request = new HttpRequestMessage(HttpMethod.Put, "api/v1/users/me")
+        {
+            Content = JsonContent.Create(requestDto),
+        };
+
+        return await SendForResultAsync<UnictiveCurrentUserDto>(client, request, cancellationToken);
+    }
+
+    public async Task<ApiResult> ChangePasswordAsync(UnictiveChangePasswordRequestDto requestDto, CancellationToken cancellationToken)
+    {
+        var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/auth/change-password")
+        {
+            Content = JsonContent.Create(requestDto),
+        };
+
+        return await SendAsync(client, request, cancellationToken);
+    }
 }

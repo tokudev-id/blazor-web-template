@@ -3,9 +3,9 @@ using BlazorWebTemplate.Client.Services.BackEnd.Dashboard;
 using BlazorWebTemplate.Client.Services.BackEnd.Users;
 using BlazorWebTemplate.Shared.Common.Responses;
 using BlazorWebTemplate.Shared.Dashboard.Queries.GetDashboard;
+using BlazorWebTemplate.Shared.Users.Queries.GetUsers;
 using BlazorWebTemplate.Shared.Services.Authentication.Models;
 using BlazorWebTemplate.Shared.Services.Authorization.Constants;
-using BlazorWebTemplate.Shared.Users.Queries.GetUsers;
 
 namespace BlazorWebTemplate.Tests.Client;
 
@@ -34,9 +34,9 @@ public sealed class DashboardServiceTests
         {
             var items = new List<UserSummary>
             {
-                new("id-1", "A", "a@example.com", RoleNameFor.Admin, true),
-                new("id-2", "B", "b@example.com", RoleNameFor.Editor, true),
-                new("id-3", "C", "c@example.com", RoleNameFor.Viewer, false),
+                new("id-1", "A", "a@example.com", [RoleNameFor.Admin], true),
+                new("id-2", "B", "b@example.com", [RoleNameFor.Editor], true),
+                new("id-3", "C", "c@example.com", [RoleNameFor.Viewer], false),
             };
             var paged = new PagedResult<UserSummary>(items, 1, 20, 3);
             return Task.FromResult(ApiResult<PagedResult<UserSummary>>.Success(paged));
@@ -46,6 +46,12 @@ public sealed class DashboardServiceTests
             => throw new NotImplementedException();
 
         public Task<ApiResult> DeleteUserAsync(string userId, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<ApiResult> CreateUserAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
+            => throw new NotImplementedException();
+
+        public Task<ApiResult> SetUserActiveAsync(string userId, bool activate, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
     }
 

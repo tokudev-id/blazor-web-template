@@ -11,22 +11,22 @@ public static class AppThemeFactory
             PaletteLight = new PaletteLight
             {
                 Primary = brand.PrimaryColor,
-                Secondary = brand.SecondaryColor,
+                Secondary = "#565E74",
                 Tertiary = brand.AccentColor,
-                Background = "#F3F6FB",
+                Background = "#F7F9FB",
                 Surface = "#FFFFFF",
-                AppbarBackground = "#0F172A",
-                DrawerBackground = "#0B1220",
-                DrawerText = "#DCE7F6",
-                TextPrimary = "#132033",
-                TextSecondary = "#526077",
+                AppbarBackground = "#FFFFFF",
+                DrawerBackground = "#FFFFFF",
+                DrawerText = "#1A1B23",
+                TextPrimary = "#1A1B23",
+                TextSecondary = "#747686",
                 Success = "#0F9F76",
                 Warning = "#B7791F",
-                Error = "#C2413B",
-                Info = "#2563EB",
-                Divider = "#D8E1ED",
-                LinesDefault = "#D8E1ED",
-                TableLines = "#E7EDF5",
+                Error = "#BA1A1A",
+                Info = "#1F4FD8",
+                Divider = "#E0E3E5",
+                LinesDefault = "#E0E3E5",
+                TableLines = "#EEF1F5",
                 ActionDefault = brand.PrimaryColor,
                 ActionDisabled = "#A6B5C6"
             },
@@ -34,32 +34,32 @@ public static class AppThemeFactory
             {
                 Default = new DefaultTypography
                 {
-                    FontFamily = ["Public Sans", "sans-serif"]
+                    FontFamily = ["Inter", "sans-serif"]
                 },
                 H1 = new H1Typography
                 {
-                    FontFamily = ["Plus Jakarta Sans", "sans-serif"],
+                    FontFamily = ["Inter", "sans-serif"],
                     FontWeight = "800",
                     FontSize = "3.2rem",
                     LineHeight = "1"
                 },
                 H2 = new H2Typography
                 {
-                    FontFamily = ["Plus Jakarta Sans", "sans-serif"],
+                    FontFamily = ["Inter", "sans-serif"],
                     FontWeight = "800",
                     FontSize = "2.4rem",
                     LineHeight = "1.05"
                 },
                 H3 = new H3Typography
                 {
-                    FontFamily = ["Plus Jakarta Sans", "sans-serif"],
+                    FontFamily = ["Inter", "sans-serif"],
                     FontWeight = "750",
                     FontSize = "1.7rem",
                     LineHeight = "1.12"
                 },
                 H4 = new H4Typography
                 {
-                    FontFamily = ["Plus Jakarta Sans", "sans-serif"],
+                    FontFamily = ["Inter", "sans-serif"],
                     FontWeight = "700",
                     FontSize = "1.2rem",
                     LineHeight = "1.25"
@@ -89,7 +89,7 @@ public static class AppThemeFactory
             },
             LayoutProperties = new LayoutProperties
             {
-                DefaultBorderRadius = "16px"
+                DefaultBorderRadius = "8px"
             },
             Shadows = new Shadow()
         };

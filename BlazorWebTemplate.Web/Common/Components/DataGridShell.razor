@@ -46,6 +46,9 @@
                 <RowTemplate Context="item">
                     @RowTemplate(item)
                 </RowTemplate>
+                <ChildRowContent Context="childItem">
+                    @ChildRowContent?.Invoke(childItem)
+                </ChildRowContent>
             </MudTable>
 
             @if (FooterContent is not null)
@@ -106,4 +109,7 @@
 
     [Parameter, EditorRequired]
     public RenderFragment<TItem> RowTemplate { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment<TItem>? ChildRowContent { get; set; }
 }

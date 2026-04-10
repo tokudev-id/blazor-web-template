@@ -7,4 +7,7 @@ public static class BreadcrumbFor
 {
     public static IReadOnlyList<AppShellBreadcrumb> Index()
         => [new("Dashboard", CommonRouteFor.Dashboard), new("Roles", RouteFor.Index)];
+
+    public static IReadOnlyList<AppShellBreadcrumb> Manage(string roleName, string roleId)
+        => [new("Dashboard", CommonRouteFor.Dashboard), new("Roles", RouteFor.Index), new(roleName, RouteFor.Manage(roleId))];
 }

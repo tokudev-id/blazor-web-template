@@ -4,7 +4,7 @@ public sealed record UserSummary(
     string Id,
     string DisplayName,
     string Email,
-    string Role,
+    IReadOnlyList<string> Roles,
     bool IsActive,
     string? FirstName = null,
     string? LastName = null);

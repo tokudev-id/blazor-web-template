@@ -48,10 +48,10 @@ else if (_summary is not null)
             </MudItem>
         </MudGrid>
 
-        @if (_summary.RoleDistribution.Count > 0)
-        {
-            <MudGrid Spacing="3">
-                <MudItem xs="12" md="6">
+        <MudGrid Spacing="3">
+            @if (_summary.RoleDistribution.Count > 0)
+            {
+                <MudItem xs="12" md="4">
                     <PageSection Section="Users"
                                  Title="Role distribution"
                                  Subtitle="Breakdown of assigned roles across the user directory.">
@@ -71,7 +71,42 @@ else if (_summary is not null)
                         </ChildContent>
                     </PageSection>
                 </MudItem>
-                <MudItem xs="12" md="6">
+            }
+
+            <MudItem xs="12" md="4">
+                <PageSection Section="Tools"
+                             Title="Quick actions"
+                             Subtitle="Common administrative tasks for rapid deployment.">
+                    <ChildContent>
+                        <MudStack Spacing="2">
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Rounded.People"
+                                       FullWidth="true"
+                                       Href="/users">
+                                Manage users
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Rounded.AdminPanelSettings"
+                                       FullWidth="true"
+                                       Href="/roles">
+                                Configure roles
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Rounded.History"
+                                       FullWidth="true"
+                                       Href="/audit-logs">
+                                View audit logs
+                            </MudButton>
+                        </MudStack>
+                    </ChildContent>
+                </PageSection>
+            </MudItem>
+
+            <MudItem xs="12" md="4">
+                <MudStack Spacing="3">
                     <PageSection Section="Platform"
                                  Title="What this template ships"
                                  Subtitle="The defaults are designed to be branded, extended, and audited cleanly.">
@@ -92,8 +127,18 @@ else if (_summary is not null)
                             </MudStack>
                         </ChildContent>
                     </PageSection>
-                </MudItem>
-            </MudGrid>
-        }
+
+                    <MudPaper Elevation="0" Class="app-card app-tip pa-4">
+                        <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="2">
+                            <MudIcon Icon="@Icons.Material.Rounded.Lightbulb" Color="Color.Warning" Size="Size.Small" Style="margin-top:2px;flex-shrink:0" />
+                            <div>
+                                <MudText Typo="Typo.overline" Class="app-card__section" Style="color:#b7791f">Optimization tip</MudText>
+                                <MudText Typo="Typo.body2" Class="app-text-muted">Ensure all users have roles assigned to maximize access control coverage across the workspace.</MudText>
+                            </div>
+                        </MudStack>
+                    </MudPaper>
+                </MudStack>
+            </MudItem>
+        </MudGrid>
     </MudStack>
 }

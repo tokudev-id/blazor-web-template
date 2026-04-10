@@ -21,4 +21,19 @@ internal sealed class UnictiveRoleDto
 
     [JsonPropertyName("permissions")]
     public List<string> Permissions { get; set; } = [];
+
+    [JsonPropertyName("usersCount")]
+    public int UsersCount { get; set; }
+}
+
+internal sealed class UnictiveUpdateRoleRequestDto
+{
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+}
+
+internal sealed class UnictiveUpdateRolePermissionsRequestDto
+{
+    [JsonPropertyName("permissions")]
+    public List<string> Permissions { get; set; } = [];
 }

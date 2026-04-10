@@ -1,0 +1,71 @@
+@page "/profile"
+@attribute [Authorize]
+
+<PageTitle>My Profile</PageTitle>
+
+@if (_isLoading)
+{
+    <Loading Height="148px" />
+}
+else
+{
+    <MudStack Spacing="3">
+        <PageHeader Title="My profile"
+                    Section="Account"
+                    Subtitle="Manage your personal information and account security."
+                    Breadcrumbs="@_breadcrumbs" />
+
+        <MudGrid Spacing="3">
+            <MudItem xs="12" md="6">
+                <PageSection Section="Personal"
+                             Title="Profile information"
+                             Subtitle="Update your display name and contact details.">
+                    <ChildContent>
+                        <MudStack Spacing="3">
+                            @if (!string.IsNullOrWhiteSpace(_profileError))
+                            {
+                                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">@_profileError</MudAlert>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(_profileSuccess))
+                            {
+                                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">@_profileSuccess</MudAlert>
+                            }
+
+                            <MudTextField Value="@_email"
+                                          Label="Email"
+                                          Variant="Variant.Outlined"
+                                          ReadOnly="true"
+                                          HelperText="Email cannot be changed." />
+
+                            <MudTextField @bind-Value="_firstName"
+                                          Label="First name"
+                                          Variant="Variant.Outlined"
+                                          Disabled="@_savingProfile" />
+
+                            <MudTextField @bind-Value="_lastName"
+                                          Label="Last name"
+                                          Variant="Variant.Outlined"
+                                          Disabled="@_savingProfile" />
+
+                            <MudTextField @bind-Value="_phoneNumber"
+                                          Label="Phone number"
+                                          Variant="Variant.Outlined"
+                                          Disabled="@_savingProfile" />
+
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       OnClick="SaveProfileAsync"
+                                       Disabled="@_savingProfile">
+                                @if (_savingProfile)
+                                {
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                }
+                                Save changes
+                            </MudButton>
+                        </MudStack>
+                    </ChildContent>
+                </PageSection>
+            </MudItem>
+        </MudGrid>
+    </MudStack>
+}

@@ -1,0 +1,224 @@
+@using BlazorWebTemplate.Client.Services.BackEnd.Users
+@using BlazorWebTemplate.Shared.Users.Queries.GetUsers
+@using System.Text.RegularExpressions
+@inject IUserService UserService
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Rounded.PersonAdd" Class="mr-2" />
+            Add new user
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack Spacing="3">
+            @if (!string.IsNullOrWhiteSpace(_submitError))
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">@_submitError</MudAlert>
+            }
+
+            <MudStack Row="true" Spacing="2">
+                <MudTextField @bind-Value="_firstName"
+                              Label="First name"
+                              Variant="Variant.Outlined"
+                              Disabled="@_saving"
+                              MaxLength="FirstNameMax"
+                              HelperText="@($"Optional · max {FirstNameMax} chars")"
+                              Error="@(_firstNameError is not null)"
+                              ErrorText="@_firstNameError"
+                              OnBlur="ValidateFirstName"
+                              Class="flex-1" />
+                <MudTextField @bind-Value="_lastName"
+                              Label="Last name"
+                              Variant="Variant.Outlined"
+                              Disabled="@_saving"
+                              MaxLength="LastNameMax"
+                              HelperText="@($"Optional · max {LastNameMax} chars")"
+                              Error="@(_lastNameError is not null)"
+                              ErrorText="@_lastNameError"
+                              OnBlur="ValidateLastName"
+                              Class="flex-1" />
+            </MudStack>
+
+            <MudTextField @bind-Value="_email"
+                          Label="Email address"
+                          Variant="Variant.Outlined"
+                          InputType="InputType.Email"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Rounded.Email"
+                          Disabled="@_saving"
+                          Required="true"
+                          MaxLength="EmailMax"
+                          HelperText="@($"Max {EmailMax} characters")"
+                          Error="@(_emailError is not null)"
+                          ErrorText="@_emailError"
+                          OnBlur="ValidateEmail" />
+
+            <MudTextField @bind-Value="_password"
+                          Label="Password"
+                          Variant="Variant.Outlined"
+                          InputType="InputType.Password"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Rounded.Lock"
+                          Disabled="@_saving"
+                          Required="true"
+                          MaxLength="PasswordMax"
+                          HelperText="@($"{PasswordMin}–{PasswordMax} characters")"
+                          Error="@(_passwordError is not null)"
+                          ErrorText="@_passwordError"
+                          OnBlur="ValidatePassword" />
+
+            <MudTextField @bind-Value="_confirmPassword"
+                          Label="Confirm password"
+                          Variant="Variant.Outlined"
+                          InputType="InputType.Password"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Rounded.Lock"
+                          Disabled="@_saving"
+                          Required="true"
+                          MaxLength="PasswordMax"
+                          Error="@(_confirmPasswordError is not null)"
+                          ErrorText="@_confirmPasswordError"
+                          OnBlur="ValidateConfirmPassword" />
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Text" Disabled="@_saving">Cancel</MudButton>
+        <MudButton Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="SaveAsync"
+                   Disabled="@_saving">
+            @if (_saving)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            }
+            Create user
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private const int FirstNameMin = 2;
+    private const int FirstNameMax = 100;
+    private const int LastNameMin  = 2;
+    private const int LastNameMax  = 100;
+    private const int EmailMax     = 254;
+    private const int PasswordMin  = 6;
+    private const int PasswordMax  = 128;
+
+    private string _email           = string.Empty;
+    private string _password        = string.Empty;
+    private string _confirmPassword = string.Empty;
+    private string? _firstName;
+    private string? _lastName;
+    private bool _saving;
+
+    private string? _firstNameError;
+    private string? _lastNameError;
+    private string? _emailError;
+    private string? _passwordError;
+    private string? _confirmPasswordError;
+    private string? _submitError;
+
+    private static readonly Regex EmailRegex =
+        new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private void ValidateFirstName()
+    {
+        if (string.IsNullOrWhiteSpace(_firstName)) { _firstNameError = null; return; }
+        var len = _firstName.Trim().Length;
+        if (len < FirstNameMin)
+            _firstNameError = $"First name must be at least {FirstNameMin} characters.";
+        else if (len > FirstNameMax)
+            _firstNameError = $"First name cannot exceed {FirstNameMax} characters.";
+        else
+            _firstNameError = null;
+    }
+
+    private void ValidateLastName()
+    {
+        if (string.IsNullOrWhiteSpace(_lastName)) { _lastNameError = null; return; }
+        var len = _lastName.Trim().Length;
+        if (len < LastNameMin)
+            _lastNameError = $"Last name must be at least {LastNameMin} characters.";
+        else if (len > LastNameMax)
+            _lastNameError = $"Last name cannot exceed {LastNameMax} characters.";
+        else
+            _lastNameError = null;
+    }
+
+    private void ValidateEmail()
+    {
+        if (string.IsNullOrWhiteSpace(_email))
+            _emailError = "Email address is required.";
+        else if (_email.Length > EmailMax)
+            _emailError = $"Email cannot exceed {EmailMax} characters.";
+        else if (!EmailRegex.IsMatch(_email))
+            _emailError = "Enter a valid email address.";
+        else
+            _emailError = null;
+    }
+
+    private void ValidatePassword()
+    {
+        if (string.IsNullOrWhiteSpace(_password))
+            _passwordError = "Password is required.";
+        else if (_password.Length < PasswordMin)
+            _passwordError = $"Password must be at least {PasswordMin} characters.";
+        else if (_password.Length > PasswordMax)
+            _passwordError = $"Password cannot exceed {PasswordMax} characters.";
+        else
+            _passwordError = null;
+
+        if (!string.IsNullOrEmpty(_confirmPassword))
+            ValidateConfirmPassword();
+    }
+
+    private void ValidateConfirmPassword()
+    {
+        if (string.IsNullOrWhiteSpace(_confirmPassword))
+            _confirmPasswordError = "Please confirm your password.";
+        else if (_confirmPassword != _password)
+            _confirmPasswordError = "Passwords do not match.";
+        else
+            _confirmPasswordError = null;
+    }
+
+    private bool ValidateAll()
+    {
+        ValidateFirstName();
+        ValidateLastName();
+        ValidateEmail();
+        ValidatePassword();
+        ValidateConfirmPassword();
+        return _firstNameError is null
+            && _lastNameError is null
+            && _emailError is null
+            && _passwordError is null
+            && _confirmPasswordError is null;
+    }
+
+    private async Task SaveAsync()
+    {
+        _submitError = null;
+        if (!ValidateAll()) return;
+
+        _saving = true;
+        var result = await UserService.CreateUserAsync(
+            new CreateUserRequest(_email, _password, _confirmPassword, _firstName, _lastName));
+        _saving = false;
+
+        if (result.IsFailure)
+        {
+            _submitError = result.Error?.Message ?? "Failed to create user.";
+            return;
+        }
+
+        MudDialog.Close(DialogResult.Ok(_email));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

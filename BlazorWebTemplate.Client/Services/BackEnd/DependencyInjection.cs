@@ -1,3 +1,4 @@
+using BlazorWebTemplate.Client.Services.BackEnd.AuditLogs;
 using BlazorWebTemplate.Client.Services.BackEnd.Auth;
 using BlazorWebTemplate.Client.Services.BackEnd.Dashboard;
 using BlazorWebTemplate.Client.Services.BackEnd.Rbac;
@@ -43,12 +44,15 @@ public static class DependencyInjection
         services.AddScoped<IAuthApi, AuthApi>();
         services.AddScoped<IUserApi, UserApi>();
         services.AddScoped<IRbacApi, RbacApi>();
+        services.AddScoped<IAuditLogApi, AuditLogApi>();
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IProfileService, ProfileService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IRbacService, RbacService>();
+        services.AddScoped<IAuditLogService, AuditLogService>();
 
         return services;
     }

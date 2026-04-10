@@ -4,146 +4,94 @@
 <PageTitle>Roles</PageTitle>
 
 <MudStack Spacing="3">
-    <PageHeader Title="Roles &amp; Permissions"
+    <PageHeader Title="Roles"
                 Section="Administration"
-                Subtitle="Define custom roles, inspect available permissions, and control access across the workspace."
+                Subtitle="Manage roles and their associated permissions across the workspace."
                 Breadcrumbs="@_breadcrumbs" />
 
-    <MudGrid Spacing="3">
-
-        <MudItem xs="12" lg="4">
-            <PageSection Section="System"
-                         Title="Available permissions"
-                         Subtitle="All permissions registered in the backend. Assign them to roles during creation.">
-                @if (_permissionsLoading)
+    <DataGridShell TItem="RoleSummary"
+                   Section="Directory"
+                   Title="Role directory"
+                   Subtitle="All roles currently defined in the system."
+                   Items="@_roles"
+                   ErrorMessage="@_rolesError"
+                   IsLoading="@_rolesLoading"
+                   EmptyTitle="No roles found"
+                   EmptyMessage="No roles have been defined in the system yet.">
+        <HeaderActions>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Rounded.Add"
+                       Size="Size.Small"
+                       OnClick="OpenCreateRoleDialogAsync">
+                New role
+            </MudButton>
+        </HeaderActions>
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Permissions</MudTh>
+            <MudTh>Assigned Users</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <MudText Typo="Typo.body2" Style="font-weight:600">@context.Name</MudText>
+            </MudTd>
+            <MudTd DataLabel="Permissions">
+                @if (context.Permissions.Count == 0)
                 {
-                    <Loading Height="80px" />
-                }
-                else if (!string.IsNullOrWhiteSpace(_permissionsError))
-                {
-                    <StateView ErrorMessage="@_permissionsError" />
-                }
-                else if (_permissions.Count == 0)
-                {
-                    <StateView IsEmpty="true"
-                               EmptyTitle="No permissions found"
-                               EmptyMessage="The backend has no registered permissions yet." />
+                    <MudText Typo="Typo.caption" Class="app-text-muted">—</MudText>
                 }
                 else
                 {
                     <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
-                        @foreach (var permission in _permissions)
+                        @foreach (var perm in context.Permissions.Take(_maxPermsVisible))
                         {
-                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@permission</MudChip>
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
+                                     Color="Color.Default" Class="app-perm-chip">@perm</MudChip>
                         }
-                    </MudStack>
-                }
-            </PageSection>
-        </MudItem>
-
-        <MudItem xs="12" lg="4">
-            <PageSection Section="Action"
-                         Title="Create role"
-                         Subtitle="Define a new role and attach permissions to it. The role becomes available for assignment immediately.">
-
-                @if (!string.IsNullOrWhiteSpace(_createError))
-                {
-                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-2">@_createError</MudAlert>
-                }
-
-                <MudStack Spacing="2">
-                    <MudTextField @bind-Value="_roleName"
-                                  Label="Role name"
-                                  Variant="Variant.Outlined"
-                                  Placeholder="e.g. Moderator"
-                                  Disabled="@_creating" />
-
-                    @if (_permissions.Count > 0)
-                    {
-                        <MudText Typo="Typo.caption" Class="app-text-muted">Select permissions for this role (optional)</MudText>
-                        <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
-                            @foreach (var permission in _permissions)
-                            {
-                                var isSelected = _selectedPermissions.Contains(permission);
-                                <MudChip T="string"
-                                         Size="Size.Small"
-                                         Variant="@(isSelected ? Variant.Filled : Variant.Outlined)"
-                                         Color="@(isSelected ? Color.Secondary : Color.Default)"
-                                         OnClick="@(() => TogglePermission(permission))"
-                                         Disabled="@_creating">
-                                    @permission
+                        @if (context.Permissions.Count > _maxPermsVisible)
+                        {
+                            <MudTooltip Text="@string.Join(", ", context.Permissions.Skip(_maxPermsVisible))">
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
+                                         Color="Color.Default" Class="app-perm-chip">
+                                    +@(context.Permissions.Count - _maxPermsVisible) more
                                 </MudChip>
-                            }
-                        </MudStack>
-                    }
-
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               OnClick="CreateRoleAsync"
-                               Disabled="@(_creating || string.IsNullOrWhiteSpace(_roleName))">
-                        @if (_creating)
-                        {
-                            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
-                        }
-                        Create role
-                    </MudButton>
-                </MudStack>
-            </PageSection>
-        </MudItem>
-
-        <MudItem xs="12" lg="4">
-            <PageSection Section="Directory"
-                         Title="Existing roles"
-                         Subtitle="All roles currently defined in the system.">
-                @if (_rolesLoading)
-                {
-                    <Loading Height="80px" />
-                }
-                else if (!string.IsNullOrWhiteSpace(_rolesError))
-                {
-                    <StateView ErrorMessage="@_rolesError" />
-                }
-                else if (_roles.Count == 0)
-                {
-                    <StateView IsEmpty="true"
-                               EmptyTitle="No roles yet"
-                               EmptyMessage="Create the first role using the form." />
-                }
-                else
-                {
-                    <MudStack Spacing="2">
-                        @foreach (var role in _roles)
-                        {
-                            <MudPaper Elevation="0" Class="app-card pa-3">
-                                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-                                    <div>
-                                        <MudText Typo="Typo.subtitle2">@role.Name</MudText>
-                                        @if (role.Permissions.Count > 0)
-                                        {
-                                            <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1" Class="mt-1">
-                                                @foreach (var perm in role.Permissions)
-                                                {
-                                                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Default">@perm</MudChip>
-                                                }
-                                            </MudStack>
-                                        }
-                                        else
-                                        {
-                                            <MudText Typo="Typo.caption" Class="app-text-muted">No permissions</MudText>
-                                        }
-                                    </div>
-                                    <MudIconButton Icon="@Icons.Material.Rounded.DeleteOutline"
-                                                   Size="Size.Small"
-                                                   Color="Color.Error"
-                                                   Disabled="@_deletingRoleId.Contains(role.Id)"
-                                                   OnClick="@(() => DeleteRoleAsync(role.Id))" />
-                                </MudStack>
-                            </MudPaper>
+                            </MudTooltip>
                         }
                     </MudStack>
                 }
-            </PageSection>
-        </MudItem>
-
-    </MudGrid>
+            </MudTd>
+            <MudTd DataLabel="Assigned Users">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                    <MudIcon Icon="@Icons.Material.Rounded.People" Size="Size.Small" Class="app-text-muted" />
+                    <MudText Typo="Typo.body2">@context.UsersCount</MudText>
+                </MudStack>
+            </MudTd>
+            <MudTd>
+                <MudMenu Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small" Dense="true"
+                         AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                    <MudMenuItem Icon="@Icons.Material.Rounded.EditNote"
+                                 Href="@($"/roles/{context.Id}")">
+                        Manage
+                    </MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Rounded.DeleteOutline"
+                                 IconColor="Color.Error"
+                                 Disabled="@_deletingRoleId.Contains(context.Id)"
+                                 OnClick="@(() => DeleteRoleAsync(context))">
+                        Delete
+                    </MudMenuItem>
+                </MudMenu>
+            </MudTd>
+        </RowTemplate>
+        <FooterContent>
+            <div class="app-pagination">
+                <span></span>
+                @if (_roles.Count > 0)
+                {
+                    <MudText Typo="Typo.caption" Class="app-text-muted">@_roles.Count total roles</MudText>
+                }
+            </div>
+        </FooterContent>
+    </DataGridShell>
 </MudStack>

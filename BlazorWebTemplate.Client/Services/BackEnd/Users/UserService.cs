@@ -1,13 +1,10 @@
-using BlazorWebTemplate.Client.Services.BackEnd.Infrastructure.Mapping;
 using BlazorWebTemplate.Shared.Common.Constants;
 using BlazorWebTemplate.Shared.Common.Responses;
 using BlazorWebTemplate.Shared.Users.Queries.GetUsers;
 
 namespace BlazorWebTemplate.Client.Services.BackEnd.Users;
 
-internal sealed class UserService(
-    IUserApi usersApiClient,
-    IUserRoleMapper roleMapper) : IUserService
+internal sealed class UserService(IUserApi usersApiClient) : IUserService
 {
     public async Task<ApiResult<PagedResult<UserSummary>>> GetUsersAsync(string? search = null, int pageNumber = 1, CancellationToken cancellationToken = default)
     {
@@ -47,13 +44,28 @@ internal sealed class UserService(
     public Task<ApiResult> DeleteUserAsync(string userId, CancellationToken cancellationToken = default)
         => usersApiClient.DeleteUserAsync(userId, cancellationToken);
 
-    private UserSummary MapToSummary(UnictiveUserDto user) => new(
+    public Task<ApiResult> SetUserActiveAsync(string userId, bool activate, CancellationToken cancellationToken = default)
+        => activate
+            ? usersApiClient.ActivateUserAsync(userId, cancellationToken)
+            : usersApiClient.DeactivateUserAsync(userId, cancellationToken);
+
+    public Task<ApiResult> CreateUserAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
+        => usersApiClient.RegisterUserAsync(new UnictiveRegisterUserRequestDto
+        {
+            Email = request.Email,
+            Password = request.Password,
+            ConfirmPassword = request.ConfirmPassword,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+        }, cancellationToken);
+
+    private static UserSummary MapToSummary(UnictiveUserDto user) => new(
         user.Id,
         string.IsNullOrWhiteSpace(user.FullName)
             ? string.Join(' ', new[] { user.FirstName, user.LastName }.Where(static v => !string.IsNullOrWhiteSpace(v)))
             : user.FullName,
         user.Email,
-        roleMapper.MapToAppRole(user.Roles.FirstOrDefault()),
+        user.Roles.ToList(),
         user.IsActive,
         user.FirstName,
         user.LastName);

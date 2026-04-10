@@ -34,5 +34,30 @@ internal sealed class UnictiveCurrentUserDto
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
     public string[] Roles { get; set; } = [];
+}
+
+internal sealed class UnictiveUpdateProfileRequestDto
+{
+    [JsonPropertyName("firstName")]
+    public string? FirstName { get; set; }
+
+    [JsonPropertyName("lastName")]
+    public string? LastName { get; set; }
+
+    [JsonPropertyName("phoneNumber")]
+    public string? PhoneNumber { get; set; }
+}
+
+internal sealed class UnictiveChangePasswordRequestDto
+{
+    [JsonPropertyName("currentPassword")]
+    public string CurrentPassword { get; set; } = string.Empty;
+
+    [JsonPropertyName("newPassword")]
+    public string NewPassword { get; set; } = string.Empty;
+
+    [JsonPropertyName("confirmNewPassword")]
+    public string ConfirmNewPassword { get; set; } = string.Empty;
 }

@@ -1,81 +1,112 @@
 @page "/login"
+@layout LoginLayout
 @attribute [AllowAnonymous]
 
 <PageTitle>Login</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.False" Class="app-login">
-    <MudGrid Spacing="4" Class="app-login__grid">
-        <MudItem xs="12" lg="6">
-            <PageSection Section="@Brand.CompanyName"
-                         Title="@Brand.ProductName"
-                         Subtitle="@Brand.ProductDescription"
-                         Class="app-login__brand-panel">
-                <MudText Typo="Typo.h2">Operational UI that scales beyond the demo stage.</MudText>
-                <MudText Typo="Typo.body1" Class="app-text-muted">
-                    The shell is built around reusable cards, tables, state views, validated options, and clean backend boundaries so teams can white-label it without reworking the core.
-                </MudText>
-                <MudStack Spacing="1" Class="app-login__benefits">
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                        <MudIcon Icon="@Icons.Material.Rounded.VerifiedUser" Color="Color.Primary" Size="Size.Small" />
-                        <MudText Typo="Typo.body2">Role-aware navigation and protected modules.</MudText>
-                    </MudStack>
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                        <MudIcon Icon="@Icons.Material.Rounded.Api" Color="Color.Primary" Size="Size.Small" />
-                        <MudText Typo="Typo.body2">Retry-aware backend adapters with correlation headers.</MudText>
-                    </MudStack>
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                        <MudIcon Icon="@Icons.Material.Rounded.Widgets" Color="Color.Primary" Size="Size.Small" />
-                        <MudText Typo="Typo.body2">Reusable enterprise-grade page primitives.</MudText>
-                    </MudStack>
-                </MudStack>
-                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">
-                    Register a user via the backend API Swagger UI, then sign in with that email and password.
-                </MudAlert>
-            </PageSection>
-        </MudItem>
-        <MudItem xs="12" lg="6">
-            <PageSection Section="Authentication"
-                         Title="Sign in"
-                         Subtitle="Start a secure cookie-backed session and open the operations workspace."
-                         Class="app-login__form-panel">
+<div class="split-login">
+    <!-- Left Info Panel -->
+    <div class="split-login__info">
+        <div class="split-login__info-content">
+            <div class="split-badge">
+                <span class="split-badge-dot"></span> @Brand.CompanyName Secure
+            </div>
+            
+            <h1 class="split-heading">Operational UI that scales beyond the demo stage.</h1>
+            <p class="split-description">
+                The shell is built around reusable cards, tables, state views, validated options, and clean backend boundaries so teams can white-label it without reworking the core.
+            </p>
+            
+            <div class="split-benefits">
+                <div class="split-benefit">
+                     <div class="split-benefit-icon"><MudIcon Icon="@Icons.Material.Rounded.VerifiedUser" Size="Size.Small" /></div>
+                     <div class="split-benefit-text">Role-aware navigation and protected modules.</div>
+                </div>
+                <div class="split-benefit">
+                     <div class="split-benefit-icon"><MudIcon Icon="@Icons.Material.Rounded.Api" Size="Size.Small" /></div>
+                     <div class="split-benefit-text">Retry-aware backend adapters with correlation headers.</div>
+                </div>
+                <div class="split-benefit">
+                     <div class="split-benefit-icon"><MudIcon Icon="@Icons.Material.Rounded.Widgets" Size="Size.Small" /></div>
+                     <div class="split-benefit-text">Reusable enterprise-grade page primitives.</div>
+                </div>
+            </div>
+            
+            <div class="split-alert">
+                 <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="m-0">
+                      Register a user via the backend API Swagger UI, then sign in with that email and password.
+                 </MudAlert>
+            </div>
+        </div>
+    </div>
 
-                @if (!string.IsNullOrWhiteSpace(_errorMessage))
-                {
-                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">@_errorMessage</MudAlert>
-                }
+    <!-- Right Form Panel -->
+    <div class="split-login__form">
+         <div class="split-login__form-content">
+             
+             @if (!string.IsNullOrWhiteSpace(_errorMessage))
+             {
+                 <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-6">@_errorMessage</MudAlert>
+             }
 
-                <form method="post" action="@CommonRouteFor.AccountLogin" class="app-auth-form">
-                    <AntiforgeryToken />
-                    <input type="hidden" name="returnUrl" value="@ReturnUrl" />
-                    <MudStack Spacing="2">
-                        <MudTextField T="string"
-                                      name="Email"
-                                      Label="Email"
-                                      InputType="InputType.Email"
-                                      Variant="Variant.Outlined"
-                                      Value="@_email"
-                                      ValueChanged="@(value => _email = value ?? string.Empty)"
-                                      Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Rounded.Email" />
-                        <MudTextField T="string"
-                                      name="Password"
-                                      Label="Password"
-                                      Variant="Variant.Outlined"
-                                      InputType="InputType.Password"
-                                      Value="@_password"
-                                      ValueChanged="@(value => _password = value ?? string.Empty)"
-                                      Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Rounded.Lock" />
-                        <MudButton Color="Color.Primary"
-                                   Variant="Variant.Filled"
-                                   Size="Size.Large"
-                                   FullWidth="true"
-                                   ButtonType="ButtonType.Submit">
-                            Open workspace
-                        </MudButton>
-                    </MudStack>
-                </form>
-            </PageSection>
-        </MudItem>
-    </MudGrid>
-</MudContainer>
+             <div class="split-logo">
+                 <MudIcon Icon="@Icons.Material.Rounded.Shield" Size="Size.Large" />
+                 <span>@Brand.ProductName</span>
+             </div>
+             
+             <h2 class="split-form-heading">Sign in</h2>
+             <p class="split-form-subtitle">Start a secure cookie-backed session and open the operations workspace.</p>
+             
+             <form method="post" action="@CommonRouteFor.AccountLogin" class="app-auth-form">
+                  <AntiforgeryToken />
+                  <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                  
+                  <div class="split-form-fields">
+                      <div>
+                          <div class="split-form-label">
+                              <span>Email Address</span>
+                          </div>
+                          <MudTextField T="string"
+                                        name="Email"
+                                        Variant="Variant.Outlined"
+                                        Value="@_email"
+                                        ValueChanged="@(value => _email = value ?? string.Empty)"
+                                        Adornment="Adornment.Start"
+                                        AdornmentIcon="@Icons.Material.Rounded.Email" 
+                                        Placeholder="name@company.com" />
+                      </div>
+                      
+                      <div>
+                          <div class="split-form-label">
+                              <span>Password</span>
+                              <a href="@CommonRouteFor.AccountLogin">Forgot your password?</a>
+                          </div>
+                          <MudTextField T="string"
+                                        name="Password"
+                                        Variant="Variant.Outlined"
+                                        InputType="InputType.Password"
+                                        Value="@_password"
+                                        ValueChanged="@(value => _password = value ?? string.Empty)"
+                                        Adornment="Adornment.Start"
+                                        AdornmentIcon="@Icons.Material.Rounded.Lock"
+                                        Placeholder="••••••••" />
+                      </div>
+                      
+                      <MudButton Color="Color.Primary"
+                                 Variant="Variant.Filled"
+                                 Size="Size.Large"
+                                 FullWidth="true"
+                                 Class="split-login-btn"
+                                 EndIcon="@Icons.Material.Rounded.ArrowForward"
+                                 ButtonType="ButtonType.Submit">
+                          Open workspace
+                      </MudButton>
+                  </div>
+             </form>
+             
+             <div class="split-login-support">
+                 Don't have access? <a href="#">Contact Administrator</a>
+             </div>
+         </div>
+    </div>
+</div>

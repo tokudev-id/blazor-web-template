@@ -8,4 +8,6 @@ public interface IUserService
     Task<ApiResult<PagedResult<UserSummary>>> GetUsersAsync(string? search = null, int pageNumber = 1, CancellationToken cancellationToken = default);
     Task<ApiResult<UserSummary>> UpdateUserAsync(string userId, UserUpdateRequest request, CancellationToken cancellationToken = default);
     Task<ApiResult> DeleteUserAsync(string userId, CancellationToken cancellationToken = default);
+    Task<ApiResult> CreateUserAsync(CreateUserRequest request, CancellationToken cancellationToken = default);
+    Task<ApiResult> SetUserActiveAsync(string userId, bool activate, CancellationToken cancellationToken = default);
 }

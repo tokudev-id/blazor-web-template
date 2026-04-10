@@ -29,7 +29,8 @@ internal sealed class DashboardService(
         var activeUsers = items.Count(u => u.IsActive);
         var inactiveUsers = items.Count(u => !u.IsActive);
         var roleDistribution = items
-            .GroupBy(u => u.Role)
+            .SelectMany(u => u.Roles)
+            .GroupBy(r => r)
             .ToDictionary(g => g.Key, g => g.Count());
 
         return ApiResult<DashboardSummary>.Success(new DashboardSummary(

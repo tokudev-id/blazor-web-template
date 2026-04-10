@@ -20,80 +20,36 @@ public partial class Roles
     private IDialogService DialogService { get; set; } = default!;
 
     protected IReadOnlyList<AppShellBreadcrumb> _breadcrumbs = BreadcrumbFor.Index();
-
-    protected List<string> _permissions = [];
-    protected bool _permissionsLoading = true;
-    protected string? _permissionsError;
-
     protected List<RoleSummary> _roles = [];
     protected bool _rolesLoading = true;
     protected string? _rolesError;
     protected readonly HashSet<string> _deletingRoleId = [];
-
-    protected string _roleName = string.Empty;
-    protected readonly HashSet<string> _selectedPermissions = [];
-    protected bool _creating;
-    protected string? _createError;
+    protected const int _maxPermsVisible = 4;
 
     protected override async Task OnInitializedAsync()
     {
-        var permissionsTask = RbacService.GetPermissionsAsync();
-        var rolesTask = RbacService.GetRolesAsync();
-
-        await Task.WhenAll(permissionsTask, rolesTask);
-
-        var permResult = permissionsTask.Result;
-        _permissionsLoading = false;
-        if (permResult.IsFailure)
-            _permissionsError = permResult.Error?.Message ?? "Could not load permissions.";
-        else
-            _permissions = permResult.Value ?? [];
-
-        var rolesResult = rolesTask.Result;
+        var result = await RbacService.GetRolesAsync();
         _rolesLoading = false;
-        if (rolesResult.IsFailure)
-            _rolesError = rolesResult.Error?.Message ?? "Could not load roles.";
-        else
-            _roles = rolesResult.Value ?? [];
-    }
-
-    protected void TogglePermission(string permission)
-    {
-        if (!_selectedPermissions.Remove(permission))
-            _selectedPermissions.Add(permission);
-    }
-
-    protected async Task CreateRoleAsync()
-    {
-        _createError = null;
-        _creating = true;
-
-        var result = await RbacService.CreateRoleAsync(_roleName.Trim(), _selectedPermissions);
-        _creating = false;
 
         if (result.IsFailure)
-        {
-            _createError = result.Error?.Message ?? "Failed to create role.";
-            return;
-        }
-
-        var name = _roleName.Trim();
-        Snackbar.Add($"Role \"{name}\" created successfully.", Severity.Success);
-        _roleName = string.Empty;
-        _selectedPermissions.Clear();
-
-        await RefreshRolesAsync();
+            _rolesError = result.Error?.Message ?? "Could not load roles.";
+        else
+            _roles = result.Value ?? [];
     }
 
-    protected async Task DeleteRoleAsync(string roleId)
+    protected Task OpenCreateRoleDialogAsync()
     {
-        var role = _roles.Find(r => r.Id == roleId);
-        var roleName = role?.Name ?? roleId;
+        // Placeholder — create role dialog will be implemented in the manage view
+        Snackbar.Add("Role management will be available in the dedicated manage view.", Severity.Info);
+        return Task.CompletedTask;
+    }
 
+    protected async Task DeleteRoleAsync(RoleSummary role)
+    {
         var parameters = new DialogParameters<ConfirmDialog>
         {
-            { x => x.Title, $"Delete role \"{roleName}\"?" },
-            { x => x.Message, $"This will permanently remove the \"{roleName}\" role and all its permission assignments." },
+            { x => x.Title, $"Delete \"{role.Name}\"?" },
+            { x => x.Message, $"This will permanently remove the \"{role.Name}\" role and all its permission assignments." },
             { x => x.WarningMessage, "Users with this role will lose associated permissions." },
         };
 
@@ -101,12 +57,12 @@ public partial class Roles
         var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirm delete", parameters, options);
         var dialogResult = await dialog.Result;
 
-        if (dialogResult.Canceled) return;
+        if (dialogResult is null || dialogResult.Canceled) return;
 
-        _deletingRoleId.Add(roleId);
+        _deletingRoleId.Add(role.Id);
 
-        var result = await RbacService.DeleteRoleAsync(roleId);
-        _deletingRoleId.Remove(roleId);
+        var result = await RbacService.DeleteRoleAsync(role.Id);
+        _deletingRoleId.Remove(role.Id);
 
         if (result.IsFailure)
         {
@@ -114,14 +70,8 @@ public partial class Roles
             return;
         }
 
-        _roles.RemoveAll(r => r.Id == roleId);
-        Snackbar.Add($"Role \"{roleName}\" deleted.", Severity.Success);
-    }
-
-    private async Task RefreshRolesAsync()
-    {
-        var result = await RbacService.GetRolesAsync();
-        if (result.IsSuccess)
-            _roles = result.Value ?? [];
+        _roles.RemoveAll(r => r.Id == role.Id);
+        Snackbar.Add($"Role \"{role.Name}\" deleted.", Severity.Success);
+        StateHasChanged();
     }
 }

@@ -44,6 +44,33 @@ internal sealed class RbacApi(
         return await SendForResultAsync<Guid>(client, request, cancellationToken);
     }
 
+    public async Task<ApiResult<UnictiveRoleDto>> GetRoleByIdAsync(string roleId, CancellationToken cancellationToken)
+    {
+        var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"api/v1/rbac/roles/{Uri.EscapeDataString(roleId)}");
+        return await SendForResultAsync<UnictiveRoleDto>(client, request, cancellationToken);
+    }
+
+    public async Task<ApiResult<UnictiveRoleDto>> UpdateRoleAsync(string roleId, string name, CancellationToken cancellationToken)
+    {
+        var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
+        using var request = new HttpRequestMessage(HttpMethod.Put, $"api/v1/rbac/roles/{Uri.EscapeDataString(roleId)}")
+        {
+            Content = JsonContent.Create(new UnictiveUpdateRoleRequestDto { Name = name }),
+        };
+        return await SendForResultAsync<UnictiveRoleDto>(client, request, cancellationToken);
+    }
+
+    public async Task<ApiResult<UnictiveRoleDto>> UpdateRolePermissionsAsync(string roleId, IEnumerable<string> permissions, CancellationToken cancellationToken)
+    {
+        var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
+        using var request = new HttpRequestMessage(HttpMethod.Put, $"api/v1/rbac/roles/{Uri.EscapeDataString(roleId)}/permissions")
+        {
+            Content = JsonContent.Create(new UnictiveUpdateRolePermissionsRequestDto { Permissions = permissions.ToList() }),
+        };
+        return await SendForResultAsync<UnictiveRoleDto>(client, request, cancellationToken);
+    }
+
     public async Task<ApiResult<List<string>>> GetUserRolesAsync(string userId, CancellationToken cancellationToken)
     {
         var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
@@ -58,6 +85,13 @@ internal sealed class RbacApi(
         {
             Content = JsonContent.Create(roleName),
         };
+        return await SendAsync(client, request, cancellationToken);
+    }
+
+    public async Task<ApiResult> RemoveRoleFromUserAsync(string userId, string roleName, CancellationToken cancellationToken)
+    {
+        var client = httpClientFactory.CreateClient(DependencyInjection.ApiClientName);
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/v1/rbac/users/{Uri.EscapeDataString(userId)}/roles/{Uri.EscapeDataString(roleName)}");
         return await SendAsync(client, request, cancellationToken);
     }
 }

@@ -1,0 +1,204 @@
+@page "/audit-logs"
+@attribute [Authorize(Policy = AppPolicyFor.AdminOnly)]
+
+<PageTitle>Audit Logs</PageTitle>
+
+@if (_isLoading)
+{
+    <Loading Height="148px" />
+}
+else
+{
+    <MudStack Spacing="3">
+        <PageHeader Title="Audit logs"
+                    Section="Administration"
+                    Subtitle="A tamper-evident trail of every write operation performed in the system."
+                    Breadcrumbs="@_breadcrumbs" />
+
+        <DataGridShell TItem="AuditLogSummary"
+                       Section="Activity"
+                       Title="Event log"
+                       Subtitle="All recorded system events, ordered by most recent."
+                       Items="@_logs"
+                       ErrorMessage="@_errorMessage">
+            <HeaderActions>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Default"
+                           StartIcon="@Icons.Material.Rounded.FileDownload"
+                           Size="Size.Small">
+                    Export CSV
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Rounded.FileDownload"
+                           Size="Size.Small">
+                    Export JSON
+                </MudButton>
+            </HeaderActions>
+            <ToolbarContent>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Wrap="Wrap.Wrap" Class="flex-grow-1 mb-2">
+                    <MudTextField @bind-Value="_entityFilter"
+                                  Placeholder="Filter by entity name..."
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Rounded.Search"
+                                  Margin="Margin.Dense"
+                                  Clearable="true"
+                                  OnClearButtonClick="ClearFilter"
+                                  Style="flex:1;min-width:180px" />
+
+                    <MudSelect T="string" @bind-Value="_actionFilter"
+                               Placeholder="All actions"
+                               Variant="Variant.Outlined"
+                               Margin="Margin.Dense"
+                               Style="min-width:140px">
+                        <MudSelectItem Value="@("")">All actions</MudSelectItem>
+                        <MudSelectItem Value="@("INSERT")">Insert</MudSelectItem>
+                        <MudSelectItem Value="@("UPDATE")">Update</MudSelectItem>
+                        <MudSelectItem Value="@("DELETE")">Delete</MudSelectItem>
+                    </MudSelect>
+
+                    <MudDateRangePicker @bind-DateRange="_dateRange"
+                                        Placeholder="Date range"
+                                        Variant="Variant.Outlined"
+                                        Margin="Margin.Dense"
+                                        Style="min-width:220px" />
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               OnClick="ApplyFilter">
+                        Filter
+                    </MudButton>
+                </MudStack>
+            </ToolbarContent>
+            <HeaderContent>
+                <MudTh></MudTh>
+                <MudTh>Timestamp</MudTh>
+                <MudTh>Entity</MudTh>
+                <MudTh>Action</MudTh>
+                <MudTh>User</MudTh>
+                <MudTh>IP Address</MudTh>
+                <MudTh>Correlation ID</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="log">
+                <MudTd Style="width:2.5rem;padding-right:0">
+                    @if (!string.IsNullOrWhiteSpace(log.OldValues) || !string.IsNullOrWhiteSpace(log.NewValues))
+                    {
+                        <MudIconButton Icon="@(_expandedRows.Contains(log.Id) ? Icons.Material.Rounded.ExpandLess : Icons.Material.Rounded.ChevronRight)"
+                                       Size="Size.Small"
+                                       Color="Color.Default"
+                                       OnClick="@(() => ToggleExpand(log.Id))" />
+                    }
+                </MudTd>
+                <MudTd DataLabel="Timestamp">
+                    <MudText Typo="Typo.body2">@log.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</MudText>
+                </MudTd>
+                <MudTd DataLabel="Entity">
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.body2">@log.EntityName</MudText>
+                        @if (!string.IsNullOrWhiteSpace(log.EntityId))
+                        {
+                            <MudText Typo="Typo.caption" Class="app-text-muted">@log.EntityId</MudText>
+                        }
+                    </MudStack>
+                </MudTd>
+                <MudTd DataLabel="Action">
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Filled"
+                             Color="@ActionColor(log.Action)">
+                        @log.Action
+                    </MudChip>
+                </MudTd>
+                <MudTd DataLabel="User">
+                    @if (log.UserEmail is not null)
+                    {
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                            <div class="app-user-avatar app-user-avatar--xs"
+                                 style="background:@AvatarColor(log.UserEmail)">
+                                @log.UserEmail[0].ToString().ToUpperInvariant()
+                            </div>
+                            <MudText Typo="Typo.body2">@log.UserEmail</MudText>
+                        </MudStack>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.body2">—</MudText>
+                    }
+                </MudTd>
+                <MudTd DataLabel="IP Address">
+                    <MudText Typo="Typo.body2">@(log.IPAddress ?? "—")</MudText>
+                </MudTd>
+                <MudTd DataLabel="Correlation ID">
+                    <MudText Typo="Typo.caption" Class="app-text-muted">@(log.CorrelationId ?? "—")</MudText>
+                </MudTd>
+            </RowTemplate>
+            <ChildRowContent Context="log">
+                @if (_expandedRows.Contains(log.Id) &&
+                     (!string.IsNullOrWhiteSpace(log.OldValues) || !string.IsNullOrWhiteSpace(log.NewValues)))
+                {
+                    <td colspan="7" style="padding:0;border-bottom:1px solid #2d3748">
+                        <div class="app-log-expanded">
+                            @if (!string.IsNullOrWhiteSpace(log.OldValues))
+                            {
+                                <div class="app-log-expanded__section">
+                                    <div class="app-log-expanded__label">Before</div>
+                                    <pre class="app-log-expanded__code">@log.OldValues</pre>
+                                    <div class="app-log-expanded__copy">
+                                        <MudButton Size="Size.Small"
+                                                   Variant="Variant.Text"
+                                                   StartIcon="@Icons.Material.Rounded.ContentCopy"
+                                                   Style="color:#64748b;font-size:.7rem"
+                                                   OnClick="@(() => CopyToClipboardAsync(log.OldValues!))">
+                                            Copy
+                                        </MudButton>
+                                    </div>
+                                </div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(log.NewValues))
+                            {
+                                <div class="app-log-expanded__section">
+                                    <div class="app-log-expanded__label">After</div>
+                                    <pre class="app-log-expanded__code">@log.NewValues</pre>
+                                    <div class="app-log-expanded__copy">
+                                        <MudButton Size="Size.Small"
+                                                   Variant="Variant.Text"
+                                                   StartIcon="@Icons.Material.Rounded.ContentCopy"
+                                                   Style="color:#64748b;font-size:.7rem"
+                                                   OnClick="@(() => CopyToClipboardAsync(log.NewValues!))">
+                                            Copy
+                                        </MudButton>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </td>
+                }
+                else
+                {
+                    <td colspan="7" style="padding:0;height:0;border:none"></td>
+                }
+            </ChildRowContent>
+            <FooterContent>
+                <div class="app-pagination">
+                    @if (_totalPages > 1)
+                    {
+                        <MudPagination Count="@_totalPages"
+                                       Selected="@_currentPage"
+                                       SelectedChanged="OnPageChanged"
+                                       BoundaryCount="1"
+                                       MiddleCount="3"
+                                       ShowFirstButton="true"
+                                       ShowLastButton="true" />
+                    }
+                    else
+                    {
+                        <span></span>
+                    }
+                    @if (_totalCount > 0)
+                    {
+                        <MudText Typo="Typo.caption" Class="app-text-muted">@_totalCount total events</MudText>
+                    }
+                </div>
+            </FooterContent>
+        </DataGridShell>
+    </MudStack>
+}

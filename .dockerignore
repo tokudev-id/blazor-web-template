@@ -1,0 +1,14 @@
+**/.git
+**/.gitignore
+**/bin
+**/obj
+**/*.user
+**/*.suo
+**/.vs
+**/.vscode
+**/.idea
+**/TestResults
+BlazorWebTemplate.Tests/
+README.md
+Dockerfile
+docker-compose*.yml

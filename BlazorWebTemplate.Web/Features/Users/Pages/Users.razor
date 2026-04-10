@@ -18,68 +18,145 @@
                    IsLoading="@_isLoading"
                    EmptyTitle="No users matched"
                    EmptyMessage="Try a broader search term to expand the directory results.">
+        <HeaderActions>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Rounded.PersonAdd"
+                       Size="Size.Small"
+                       OnClick="OpenInviteUserDialogAsync">
+                Invite user
+            </MudButton>
+        </HeaderActions>
         <ToolbarContent>
-            <PageToolbar>
-                <MudTextField T="string" Label="Search users" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_searchInput" />
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ApplySearch">Search</MudButton>
-                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="ClearSearch">Clear</MudButton>
-            </PageToolbar>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="flex-grow-1 mb-2">
+                <MudTextField @bind-Value="_searchInput"
+                              Placeholder="Search by name or email..."
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Rounded.Search"
+                              Margin="Margin.Dense"
+                              Clearable="true"
+                              OnClearButtonClick="ClearSearch"
+                              Style="flex:1;min-width:200px" />
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           OnClick="ApplySearch">
+                    Search
+                </MudButton>
+            </MudStack>
         </ToolbarContent>
         <HeaderContent>
-            <MudTh>Name</MudTh>
-            <MudTh>Email</MudTh>
-            <MudTh>Role</MudTh>
+            <MudTh>Name &amp; Email</MudTh>
+            <MudTh>Roles</MudTh>
+            <MudTh>Permissions</MudTh>
             <MudTh>Status</MudTh>
             <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Name">@context.DisplayName</MudTd>
-            <MudTd DataLabel="Email">@context.Email</MudTd>
-            <MudTd DataLabel="Role">
-                <MudChip T="string" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Secondary">@context.Role</MudChip>
+            @{
+                var permissions = GetUserPermissions(context.Roles);
+                const int maxVisible = 3;
+            }
+            <MudTd DataLabel="Name & Email">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                    <div class="app-user-avatar" style="background:@AvatarColor(context.DisplayName)">
+                        @GetInitials(context.DisplayName)
+                    </div>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.body2" Style="font-weight:600">@context.DisplayName</MudText>
+                        <MudText Typo="Typo.caption" Class="app-text-muted">@context.Email</MudText>
+                    </MudStack>
+                </MudStack>
+            </MudTd>
+            <MudTd DataLabel="Roles">
+                @if (context.Roles.Count == 0)
+                {
+                    <MudText Typo="Typo.caption" Class="app-text-muted">—</MudText>
+                }
+                else
+                {
+                    <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                        @foreach (var role in context.Roles)
+                        {
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="@RoleColor(role)">@role</MudChip>
+                        }
+                    </MudStack>
+                }
+            </MudTd>
+            <MudTd DataLabel="Permissions">
+                @if (permissions.Count == 0)
+                {
+                    <MudText Typo="Typo.caption" Class="app-text-muted">—</MudText>
+                }
+                else
+                {
+                    <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                        @foreach (var perm in permissions.Take(maxVisible))
+                        {
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Default"
+                                     Class="app-perm-chip">@perm</MudChip>
+                        }
+                        @if (permissions.Count > maxVisible)
+                        {
+                            <MudTooltip Text="@string.Join(", ", permissions.Skip(maxVisible))">
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Default"
+                                         Class="app-perm-chip">+@(permissions.Count - maxVisible) more</MudChip>
+                            </MudTooltip>
+                        }
+                    </MudStack>
+                }
             </MudTd>
             <MudTd DataLabel="Status">
-                <MudChip T="string" Variant="Variant.Filled" Size="Size.Small" Color="@(context.IsActive ? Color.Success : Color.Default)">
-                    @(context.IsActive ? "Active" : "Inactive")
-                </MudChip>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                    <div class="app-status-dot @(context.IsActive ? "app-status-dot--active" : "app-status-dot--inactive")"></div>
+                    <MudText Typo="Typo.body2">@(context.IsActive ? "Active" : "Inactive")</MudText>
+                </MudStack>
             </MudTd>
             <MudTd>
-                <MudStack Row="true" Spacing="0">
-                    <MudIconButton Icon="@Icons.Material.Rounded.ManageAccounts"
-                                   Size="Size.Small"
-                                   Color="Color.Primary"
-                                   Title="Assign role"
-                                   OnClick="@(() => OpenAssignRoleDialogAsync(context))" />
-                    <MudIconButton Icon="@Icons.Material.Rounded.EditNote"
-                                   Size="Size.Small"
-                                   Color="Color.Default"
-                                   Title="Edit user"
-                                   OnClick="@(() => OpenEditDialogAsync(context))" />
-                    <MudIconButton Icon="@Icons.Material.Rounded.DeleteOutline"
-                                   Size="Size.Small"
-                                   Color="Color.Error"
-                                   Title="Delete user"
-                                   Disabled="@_deletingUserId.Contains(context.Id)"
-                                   OnClick="@(() => DeleteUserAsync(context))" />
-                </MudStack>
+                <MudMenu Icon="@Icons.Material.Rounded.MoreVert" Size="Size.Small" Dense="true" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                    <MudMenuItem Icon="@Icons.Material.Rounded.ManageAccounts"
+                                 OnClick="@(() => OpenAssignRoleDialogAsync(context))">
+                        Assign role
+                    </MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Rounded.EditNote"
+                                 OnClick="@(() => OpenEditDialogAsync(context))">
+                        Edit
+                    </MudMenuItem>
+                    <MudMenuItem Icon="@(context.IsActive ? Icons.Material.Rounded.Block : Icons.Material.Rounded.CheckCircleOutline)"
+                                 IconColor="@(context.IsActive ? Color.Warning : Color.Success)"
+                                 OnClick="@(() => ToggleUserActiveAsync(context))">
+                        @(context.IsActive ? "Deactivate" : "Activate")
+                    </MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Rounded.DeleteOutline"
+                                 IconColor="Color.Error"
+                                 Disabled="@_deletingUserId.Contains(context.Id)"
+                                 OnClick="@(() => DeleteUserAsync(context))">
+                        Delete
+                    </MudMenuItem>
+                </MudMenu>
             </MudTd>
         </RowTemplate>
         <FooterContent>
-            @if (_totalPages > 1)
-            {
-                <div class="d-flex justify-center align-center pa-3">
+            <div class="app-pagination">
+                @if (_totalPages > 1)
+                {
                     <MudPagination Count="@_totalPages"
                                    Selected="@_currentPage"
                                    SelectedChanged="OnPageChanged"
-                                   Color="Color.Primary"
-                                   Variant="Variant.Outlined"
+                                   BoundaryCount="1"
+                                   MiddleCount="3"
                                    ShowFirstButton="true"
                                    ShowLastButton="true" />
-                    <MudText Typo="Typo.caption" Class="app-text-muted ml-3">
-                        @_totalCount total
-                    </MudText>
-                </div>
-            }
+                }
+                else
+                {
+                    <span></span>
+                }
+                @if (_totalCount > 0)
+                {
+                    <MudText Typo="Typo.caption" Class="app-text-muted">@_totalCount total users</MudText>
+                }
+            </div>
         </FooterContent>
     </DataGridShell>
 </MudStack>

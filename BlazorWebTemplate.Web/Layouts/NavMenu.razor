@@ -1,34 +1,60 @@
-<MudStack Class="app-sidebar" Spacing="3">
-    <MudPaper Elevation="0" Class="app-sidebar__brand">
-        <MudText Typo="Typo.overline" Class="app-sidebar__eyebrow">@Brand.CompanyName</MudText>
-        <MudText Typo="Typo.h4">@Brand.ProductName</MudText>
-        <MudText Typo="Typo.body2" Class="app-sidebar__description">@Brand.ProductDescription</MudText>
-    </MudPaper>
+<MudStack Class="app-sidebar" Spacing="0" Style="height: 100%;">
+    <div class="px-4 py-6" style="text-align: center;">
+        <MudText Typo="Typo.h5" Color="Color.Primary" Style="font-weight: 800; letter-spacing: -0.02em;">Unictive</MudText>
+        <MudText Typo="Typo.caption" Style="color: #64748b; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">Control Center</MudText>
+    </div>
 
     <AuthorizeView>
         <Authorized Context="shellAuth">
-            <MudNavMenu Rounded="true" Dense="true" Class="app-sidebar__nav">
-                <MudText Typo="Typo.overline" Class="app-sidebar__group">Workspace</MudText>
+            <MudNavMenu Rounded="true" Dense="true" Class="app-sidebar__nav px-2">
                 <MudNavLink Href="@CommonRouteFor.Dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Rounded.SpaceDashboard">Dashboard</MudNavLink>
 
-                <MudText Typo="Typo.overline" Class="app-sidebar__group">Administration</MudText>
                 <AuthorizeView Roles="@RoleNameFor.Admin">
                     <Authorized Context="adminAuth">
-                        <MudNavLink Href="@UsersRouteFor.Index" Icon="@Icons.Material.Rounded.People">Users</MudNavLink>
-                        <MudNavLink Href="@RbacRouteFor.Index" Icon="@Icons.Material.Rounded.AdminPanelSettings">Roles</MudNavLink>
+                        <MudNavLink Href="@UsersRouteFor.Index" Icon="@Icons.Material.Rounded.PeopleAlt">Users</MudNavLink>
+                        <MudNavLink Href="@RbacRouteFor.Index" Icon="@Icons.Material.Rounded.Security">Roles</MudNavLink>
+                        <MudNavLink Href="@AuditLogsRouteFor.Index" Icon="@Icons.Material.Rounded.History">Logs</MudNavLink>
                     </Authorized>
                 </AuthorizeView>
+
+                <MudNavGroup Title="Settings" Icon="@Icons.Material.Rounded.Settings" Expanded="false">
+                    <MudNavLink Href="/profile" Icon="@Icons.Material.Rounded.Person">Update Profile</MudNavLink>
+                    <MudNavLink Href="/change-password" Icon="@Icons.Material.Rounded.Lock">Change Password</MudNavLink>
+                </MudNavGroup>
             </MudNavMenu>
         </Authorized>
         <NotAuthorized>
-            <MudNavMenu Rounded="true" Dense="true" Class="app-sidebar__nav">
+            <MudNavMenu Rounded="true" Dense="true" Class="app-sidebar__nav px-2">
                 <MudNavLink Href="@CommonRouteFor.Login" Icon="@Icons.Material.Rounded.Login">Login</MudNavLink>
             </MudNavMenu>
         </NotAuthorized>
     </AuthorizeView>
 
-    <MudPaper Elevation="0" Class="app-sidebar__note">
-        <MudText Typo="Typo.overline" Class="app-sidebar__group">Platform defaults</MudText>
-        <MudText Typo="Typo.body2">Reusable page primitives, validated options, retry-aware HTTP clients, and clean Web/Client boundaries ship together in this starter.</MudText>
-    </MudPaper>
+    <MudSpacer />
+
+    <AuthorizeView>
+        <Authorized Context="profileAuth">
+            <MudMenu AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" Dense="true" ActivationEvent="MouseEvent.LeftClick">
+                <ActivatorContent>
+                    <div class="app-sidebar__user mx-3 mb-4" style="cursor: pointer; flex-direction: column; text-align: center;">
+                        <div class="app-sidebar__user-avatar mb-2" style="margin: 0 auto;">
+                            @(profileAuth.User.FindFirst("display_name")?.Value?.Substring(0, 1) ?? profileAuth.User.Identity?.Name?.Substring(0, 1) ?? "U")
+                        </div>
+                        <div class="app-sidebar__user-info">
+                            <div class="app-sidebar__user-name">@(profileAuth.User.FindFirst("display_name")?.Value ?? profileAuth.User.Identity?.Name)</div>
+                            <div class="app-sidebar__user-role" style="text-transform: uppercase;">@(profileAuth.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Viewer")</div>
+                        </div>
+                    </div>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem Icon="@Icons.Material.Rounded.Person" Href="/profile">Update Profile</MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Material.Rounded.Lock" Href="/change-password">Change Password</MudMenuItem>
+                    <MudDivider />
+                    <div class="px-4 py-2">
+                        <LogoutForm />
+                    </div>
+                </ChildContent>
+            </MudMenu>
+        </Authorized>
+    </AuthorizeView> 
 </MudStack>

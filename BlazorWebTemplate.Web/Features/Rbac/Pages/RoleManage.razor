@@ -1,0 +1,113 @@
+@page "/roles/{Id}"
+@attribute [Authorize(Policy = AppPolicyFor.AdminOnly)]
+
+<PageTitle>Manage Role</PageTitle>
+
+@if (_isLoading)
+{
+    <Loading Height="148px" />
+}
+else if (_loadError is not null)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_loadError</MudAlert>
+}
+else
+{
+    <MudStack Spacing="3">
+        <PageHeader Title="@($"Manage: {_roleName}")"
+                    Section="Administration"
+                    Subtitle="Update the role name and configure its permissions."
+                    Breadcrumbs="@_breadcrumbs" />
+
+        <MudGrid Spacing="3">
+            <!-- Role Name -->
+            <MudItem xs="12" md="6">
+                <PageSection Section="Identity"
+                             Title="Role details"
+                             Subtitle="Update the display name for this role.">
+                    <ChildContent>
+                        <MudStack Spacing="3">
+                            @if (!string.IsNullOrWhiteSpace(_nameError))
+                            {
+                                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">@_nameError</MudAlert>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(_nameSuccess))
+                            {
+                                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">@_nameSuccess</MudAlert>
+                            }
+
+                            <MudTextField @bind-Value="_roleName"
+                                          Label="Role name"
+                                          Variant="Variant.Outlined"
+                                          Disabled="@_savingName"
+                                          MaxLength="50" />
+
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       OnClick="SaveNameAsync"
+                                       Disabled="@_savingName">
+                                @if (_savingName)
+                                {
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                }
+                                Save name
+                            </MudButton>
+                        </MudStack>
+                    </ChildContent>
+                </PageSection>
+            </MudItem>
+
+            <!-- Permissions -->
+            <MudItem xs="12" md="6">
+                <PageSection Section="Access"
+                             Title="Permissions"
+                             Subtitle="Select the permissions assigned to this role.">
+                    <ChildContent>
+                        <MudStack Spacing="3">
+                            @if (!string.IsNullOrWhiteSpace(_permsError))
+                            {
+                                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true">@_permsError</MudAlert>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(_permsSuccess))
+                            {
+                                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true">@_permsSuccess</MudAlert>
+                            }
+
+                            @if (_allPermissions.Count == 0)
+                            {
+                                <MudText Typo="Typo.caption" Class="app-text-muted">No permissions available in the system.</MudText>
+                            }
+                            else
+                            {
+                                <MudStack Wrap="Wrap.Wrap" Row="true" Spacing="1">
+                                    @foreach (var perm in _allPermissions)
+                                    {
+                                        var selected = _selectedPermissions.Contains(perm);
+                                        <MudChip T="string"
+                                                 Text="@perm"
+                                                 Variant="@(selected ? Variant.Filled : Variant.Outlined)"
+                                                 Color="@(selected ? Color.Primary : Color.Default)"
+                                                 Size="Size.Small"
+                                                 OnClick="@(() => TogglePermission(perm))"
+                                                 Disabled="@_savingPerms" />
+                                    }
+                                </MudStack>
+                            }
+
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       OnClick="SavePermissionsAsync"
+                                       Disabled="@(_savingPerms || _allPermissions.Count == 0)">
+                                @if (_savingPerms)
+                                {
+                                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                }
+                                Save permissions
+                            </MudButton>
+                        </MudStack>
+                    </ChildContent>
+                </PageSection>
+            </MudItem>
+        </MudGrid>
+    </MudStack>
+}
